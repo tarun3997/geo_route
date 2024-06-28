@@ -1,6 +1,4 @@
-import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/widget/VehicleDetailsCard.dart';
 
@@ -60,7 +58,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> with SingleTicker
             Tab(child: Text("Truck", style: textStyle,)),
           ],
         ),
-            SizedBox(height: 14,),
+            const SizedBox(height: 14,),
             const VehicleDetailsCard()
 
           ],

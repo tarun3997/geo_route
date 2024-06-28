@@ -1,17 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:geo_route/screens/AuthScreens/SignIn.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+
+class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignInScreenState extends State<SignInScreen> {
 
   final _formKey = GlobalKey<FormBuilderState>();
 
@@ -22,7 +21,7 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height/3.6,
+              height: MediaQuery.of(context).size.height/4.2,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -32,21 +31,34 @@ class _SignupScreenState extends State<SignupScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Column(
                     children: [
-                      const Text("Welcome Back",
+                      const Text("Create your account",
                         style: TextStyle(
                           fontSize: 32,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text("Sign Up to continue"),
+                      const Text("Sign In to continue"),
                       SizedBox(height: 10,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
                         child: FormBuilder(
                           key: _formKey,
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
+                              FormBuilderTextField(
+                                name: 'username',
+                                decoration: const InputDecoration(
+                                    prefixIcon: Icon(Icons.person),
+                                    hintText: "username",
+                                    label: Text("Username"),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                ]),
+                              ),
                               const SizedBox(height: 10),
                               FormBuilderTextField(
                                 name: 'email',
@@ -69,9 +81,9 @@ class _SignupScreenState extends State<SignupScreen> {
                                 decoration: const InputDecoration(
                                     prefixIcon: Icon(Icons.lock),
                                     hintText: "password",
-                                    filled: true,
                                     label: Text("Password"),
-                                    fillColor: Colors.white,
+                                  filled: true,
+                                  fillColor: Colors.white,
                                   border: InputBorder.none,
                                 ),
                                 obscureText: true,
@@ -79,14 +91,27 @@ class _SignupScreenState extends State<SignupScreen> {
                                   FormBuilderValidators.required(),
                                 ]),
                               ),
-                              SizedBox(height: 10,),
-                              GestureDetector(onTap: (){}, child: Text("Forgot Password",style: TextStyle(color: Colors.blue),)),
+                              const SizedBox(height: 10),
+                              FormBuilderTextField(
+                                name: 'conform password',
+                                decoration: const InputDecoration(
+                                    prefixIcon: Icon(Icons.lock),
+                                    hintText: "conform password",
+                                    label: Text("Conform Password"),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                                obscureText: true,
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                ]),
+                              ),
                               SizedBox(height: 20,),
                               MaterialButton(
-                                elevation: 4,
-                                height: 45,
-                                minWidth: MediaQuery.of(context).size.width,
                                 color: Colors.black,
+                                height: 40,
+                                minWidth: MediaQuery.of(context).size.width,
                                 onPressed: () {
                                   // Validate and save the form values
                                   _formKey.currentState?.saveAndValidate();
@@ -96,7 +121,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   _formKey.currentState?.validate();
                                   debugPrint(_formKey.currentState?.instantValue.toString());
                                 },
-                                child: const Text('Login',style:TextStyle(color:Colors.white,fontWeight:FontWeight.w600,fontSize: 16)),
+                                child: const Text('Login',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold,fontSize: 16)),
                               )
                             ],
                           ),
@@ -106,21 +131,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don't have account?"),
+                          const Text("Already have a account?"),
                           SizedBox(width: 5,),
                           GestureDetector(onTap: (){
-                            if (Theme.of(context).platform == TargetPlatform.iOS) {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(builder: (context) => const SignInScreen()),
-                              );
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const SignInScreen()),
-                              );
-                            }
-                          }, child: const Text("Create one",style: TextStyle(color: Colors.blue))),
+                            Navigator.pop(context);
+                          }, child: const Text("Login",style: TextStyle(color: Colors.blue))),
                         ],
                       )
                     ],
