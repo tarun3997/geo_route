@@ -1,6 +1,3 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/enums/VehicleType.dart';
 import 'package:geo_route/model/VehicleShortDetailModel.dart';

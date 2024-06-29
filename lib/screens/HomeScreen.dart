@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geo_route/server/api/authenticationApi.dart';
 import 'package:geo_route/widget/CarCard.dart';
 
 import 'VehicleListScreen.dart';
@@ -20,7 +21,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text("CMD PATH",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
         actions: [
 
-          IconButton(onPressed: (){}, icon: const Icon(Icons.notifications, color: Colors.black,)),
+          IconButton(onPressed: (){
+            Authentication().handelUserLogout(context);
+          }, icon: const Icon(Icons.notifications, color: Colors.black,)),
           const CircleAvatar( radius: 16),
           const SizedBox(width: 8)
         ],

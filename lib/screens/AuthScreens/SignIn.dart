@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:geo_route/screens/HomeScreen.dart';
+import 'package:geo_route/server/api/authenticationApi.dart';
 
 
 class SignInScreen extends StatefulWidget {
@@ -38,7 +40,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       const Text("Sign In to continue"),
-                      SizedBox(height: 10,),
+                      const SizedBox(height: 10,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
                         child: FormBuilder(
@@ -107,19 +109,20 @@ class _SignInScreenState extends State<SignInScreen> {
                                   FormBuilderValidators.required(),
                                 ]),
                               ),
-                              SizedBox(height: 20,),
+                              const SizedBox(height: 20,),
                               MaterialButton(
                                 color: Colors.black,
                                 height: 40,
                                 minWidth: MediaQuery.of(context).size.width,
                                 onPressed: () {
-                                  // Validate and save the form values
-                                  _formKey.currentState?.saveAndValidate();
-                                  debugPrint(_formKey.currentState?.value.toString());
+                                  if(_formKey.currentState?.saveAndValidate() ?? false){
+                                    final name = _formKey.currentState?.fields['username']?.value;
+                                    final email = _formKey.currentState?.fields['email']?.value;
+                                    final password = _formKey.currentState?.fields['password']?.value;
 
-                                  // On another side, can access all field values without saving form with instantValues
-                                  _formKey.currentState?.validate();
-                                  debugPrint(_formKey.currentState?.instantValue.toString());
+                                    Authentication().handelUserRegistration(name, email, password, context);
+
+                                  }
                                 },
                                 child: const Text('Login',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold,fontSize: 16)),
                               )
@@ -127,12 +130,12 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10,),
+                      const SizedBox(height: 10,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text("Already have a account?"),
-                          SizedBox(width: 5,),
+                          const SizedBox(width: 5,),
                           GestureDetector(onTap: (){
                             Navigator.pop(context);
                           }, child: const Text("Login",style: TextStyle(color: Colors.blue))),

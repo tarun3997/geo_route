@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:geo_route/screens/AuthScreens/SignIn.dart';
+import 'package:geo_route/server/api/authenticationApi.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -39,7 +40,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                       const Text("Sign Up to continue"),
-                      SizedBox(height: 10,),
+                      const SizedBox(height: 10,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
                         child: FormBuilder(
@@ -79,22 +80,20 @@ class _SignupScreenState extends State<SignupScreen> {
                                   FormBuilderValidators.required(),
                                 ]),
                               ),
-                              SizedBox(height: 10,),
-                              GestureDetector(onTap: (){}, child: Text("Forgot Password",style: TextStyle(color: Colors.blue),)),
-                              SizedBox(height: 20,),
+                              const SizedBox(height: 10,),
+                              GestureDetector(onTap: (){}, child: const Text("Forgot Password",style: TextStyle(color: Colors.blue),)),
+                              const SizedBox(height: 20,),
                               MaterialButton(
                                 elevation: 4,
                                 height: 45,
                                 minWidth: MediaQuery.of(context).size.width,
                                 color: Colors.black,
                                 onPressed: () {
-                                  // Validate and save the form values
-                                  _formKey.currentState?.saveAndValidate();
-                                  debugPrint(_formKey.currentState?.value.toString());
-
-                                  // On another side, can access all field values without saving form with instantValues
-                                  _formKey.currentState?.validate();
-                                  debugPrint(_formKey.currentState?.instantValue.toString());
+                                  if(_formKey.currentState?.saveAndValidate() ?? false){
+                                    final email = _formKey.currentState?.fields['email']?.value;
+                                    final password = _formKey.currentState?.fields['password']?.value;
+                                    Authentication().handelUserLogin(email, password, context);
+                                  }
                                 },
                                 child: const Text('Login',style:TextStyle(color:Colors.white,fontWeight:FontWeight.w600,fontSize: 16)),
                               )
@@ -102,12 +101,12 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10,),
+                      const SizedBox(height: 10,),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text("Don't have account?"),
-                          SizedBox(width: 5,),
+                          const SizedBox(width: 5,),
                           GestureDetector(onTap: (){
                             if (Theme.of(context).platform == TargetPlatform.iOS) {
                               Navigator.push(
@@ -123,7 +122,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           }, child: const Text("Create one",style: TextStyle(color: Colors.blue))),
                         ],
                       ),
-                      SizedBox(height: 5,)
+                      const SizedBox(height: 5,)
                     ],
                   ),
                 ),
