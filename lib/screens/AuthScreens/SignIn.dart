@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:geo_route/screens/HomeScreen.dart';
 import 'package:geo_route/server/api/authenticationApi.dart';
+
+import 'Signup.dart';
 
 
 class SignInScreen extends StatefulWidget {
@@ -23,7 +25,7 @@ class _SignInScreenState extends State<SignInScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height/4.2,
+              height: MediaQuery.of(context).size.height/3.6,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -33,41 +35,28 @@ class _SignInScreenState extends State<SignInScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Column(
                     children: [
-                      const Text("Create your account",
+                      const Text("Welcome Back",
                         style: TextStyle(
                           fontSize: 32,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const Text("Sign In to continue"),
+                      const Text("Sign Up to continue"),
                       const SizedBox(height: 10,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
                         child: FormBuilder(
                           key: _formKey,
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              FormBuilderTextField(
-                                name: 'username',
-                                decoration: const InputDecoration(
-                                    prefixIcon: Icon(Icons.person),
-                                    hintText: "username",
-                                    label: Text("Username"),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: InputBorder.none,
-                                ),
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(),
-                                ]),
-                              ),
                               const SizedBox(height: 10),
                               FormBuilderTextField(
                                 name: 'email',
                                 decoration: const InputDecoration(
-                                    prefixIcon: Icon(Icons.mail_outline),
-                                    hintText: "email",
-                                    label: Text("Email"),
+                                  prefixIcon: Icon(Icons.mail_outline),
+                                  hintText: "email",
+                                  label: Text("Email"),
                                   filled: true,
                                   fillColor: Colors.white,
                                   border: InputBorder.none,
@@ -81,10 +70,10 @@ class _SignInScreenState extends State<SignInScreen> {
                               FormBuilderTextField(
                                 name: 'password',
                                 decoration: const InputDecoration(
-                                    prefixIcon: Icon(Icons.lock),
-                                    hintText: "password",
-                                    label: Text("Password"),
+                                  prefixIcon: Icon(Icons.lock),
+                                  hintText: "password",
                                   filled: true,
+                                  label: Text("Password"),
                                   fillColor: Colors.white,
                                   border: InputBorder.none,
                                 ),
@@ -93,38 +82,22 @@ class _SignInScreenState extends State<SignInScreen> {
                                   FormBuilderValidators.required(),
                                 ]),
                               ),
-                              const SizedBox(height: 10),
-                              FormBuilderTextField(
-                                name: 'conform password',
-                                decoration: const InputDecoration(
-                                    prefixIcon: Icon(Icons.lock),
-                                    hintText: "conform password",
-                                    label: Text("Conform Password"),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: InputBorder.none,
-                                ),
-                                obscureText: true,
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(),
-                                ]),
-                              ),
+                              const SizedBox(height: 10,),
+                              GestureDetector(onTap: (){}, child: const Text("Forgot Password",style: TextStyle(color: Colors.blue),)),
                               const SizedBox(height: 20,),
                               MaterialButton(
-                                color: Colors.black,
-                                height: 40,
+                                elevation: 4,
+                                height: 45,
                                 minWidth: MediaQuery.of(context).size.width,
+                                color: Colors.black,
                                 onPressed: () {
                                   if(_formKey.currentState?.saveAndValidate() ?? false){
-                                    final name = _formKey.currentState?.fields['username']?.value;
                                     final email = _formKey.currentState?.fields['email']?.value;
                                     final password = _formKey.currentState?.fields['password']?.value;
-
-                                    Authentication().handelUserRegistration(name, email, password, context);
-
+                                    Authentication().handelUserLogin(email, password, context);
                                   }
                                 },
-                                child: const Text('Login',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold,fontSize: 16)),
+                                child: const Text('Log In',style:TextStyle(color:Colors.white,fontWeight:FontWeight.w600,fontSize: 16)),
                               )
                             ],
                           ),
@@ -134,13 +107,24 @@ class _SignInScreenState extends State<SignInScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Already have a account?"),
+                          const Text("Don't have account?"),
                           const SizedBox(width: 5,),
                           GestureDetector(onTap: (){
-                            Navigator.pop(context);
-                          }, child: const Text("Login",style: TextStyle(color: Colors.blue))),
+                            if (Theme.of(context).platform == TargetPlatform.iOS) {
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(builder: (context) => const SignupScreen()),
+                              );
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const SignupScreen()),
+                              );
+                            }
+                          }, child: const Text("Create one",style: TextStyle(color: Colors.blue))),
                         ],
-                      )
+                      ),
+                      const SizedBox(height: 5,)
                     ],
                   ),
                 ),
