@@ -1,3 +1,4 @@
+import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/enums/VehicleType.dart';
 import 'package:geo_route/model/VehicleShortDetailModel.dart';
@@ -79,6 +80,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> with SingleTicker
     super.dispose();
   }
 
+  TextEditingController textController = TextEditingController();
   final TextStyle textStyle = const TextStyle(fontSize: 18,color: Colors.black, fontWeight: FontWeight.w600);
   @override
   Widget build(BuildContext context) {
@@ -89,9 +91,15 @@ class _VehicleListScreenState extends State<VehicleListScreen> with SingleTicker
         }, icon: const Icon(Icons.arrow_back_rounded)),
         title: const Text("All Vehicles", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
         actions: [
-          IconButton(onPressed: (){
-
-          }, icon: const Icon(Icons.search, color: Colors.black,)),
+          AnimSearchBar(width: MediaQuery.sizeOf(context).width, textController: textController, onSuffixTap: (){
+            setState(() {
+              textController.clear();
+            });
+          }, onSubmitted: (String value) {
+          },
+            color: Colors.transparent,
+            boxShadow: false,
+          )
         ],
       ),
       body: SingleChildScrollView(
