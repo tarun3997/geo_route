@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:geo_route/screens/AuthScreens/SignIn.dart';
 import 'package:geo_route/server/api/authenticationApi.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -23,7 +21,7 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height/3.6,
+              height: MediaQuery.of(context).size.height/4.2,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -33,28 +31,41 @@ class _SignupScreenState extends State<SignupScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Column(
                     children: [
-                      const Text("Welcome Back",
+                      const Text("Create your account",
                         style: TextStyle(
                           fontSize: 32,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text("Sign Up to continue"),
+                      const Text("Sign In to continue"),
                       const SizedBox(height: 10,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
                         child: FormBuilder(
                           key: _formKey,
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
+                              FormBuilderTextField(
+                                name: 'username',
+                                decoration: const InputDecoration(
+                                  prefixIcon: Icon(Icons.person),
+                                  hintText: "username",
+                                  label: Text("Username"),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                ]),
+                              ),
                               const SizedBox(height: 10),
                               FormBuilderTextField(
                                 name: 'email',
                                 decoration: const InputDecoration(
-                                    prefixIcon: Icon(Icons.mail_outline),
-                                    hintText: "email",
-                                    label: Text("Email"),
+                                  prefixIcon: Icon(Icons.mail_outline),
+                                  hintText: "email",
+                                  label: Text("Email"),
                                   filled: true,
                                   fillColor: Colors.white,
                                   border: InputBorder.none,
@@ -68,11 +79,11 @@ class _SignupScreenState extends State<SignupScreen> {
                               FormBuilderTextField(
                                 name: 'password',
                                 decoration: const InputDecoration(
-                                    prefixIcon: Icon(Icons.lock),
-                                    hintText: "password",
-                                    filled: true,
-                                    label: Text("Password"),
-                                    fillColor: Colors.white,
+                                  prefixIcon: Icon(Icons.lock),
+                                  hintText: "password",
+                                  label: Text("Password"),
+                                  filled: true,
+                                  fillColor: Colors.white,
                                   border: InputBorder.none,
                                 ),
                                 obscureText: true,
@@ -80,22 +91,38 @@ class _SignupScreenState extends State<SignupScreen> {
                                   FormBuilderValidators.required(),
                                 ]),
                               ),
-                              const SizedBox(height: 10,),
-                              GestureDetector(onTap: (){}, child: const Text("Forgot Password",style: TextStyle(color: Colors.blue),)),
+                              const SizedBox(height: 10),
+                              FormBuilderTextField(
+                                name: 'conform password',
+                                decoration: const InputDecoration(
+                                  prefixIcon: Icon(Icons.lock),
+                                  hintText: "conform password",
+                                  label: Text("Conform Password"),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                                obscureText: true,
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                ]),
+                              ),
                               const SizedBox(height: 20,),
                               MaterialButton(
-                                elevation: 4,
-                                height: 45,
-                                minWidth: MediaQuery.of(context).size.width,
                                 color: Colors.black,
+                                height: 40,
+                                minWidth: MediaQuery.of(context).size.width,
                                 onPressed: () {
                                   if(_formKey.currentState?.saveAndValidate() ?? false){
+                                    final name = _formKey.currentState?.fields['username']?.value;
                                     final email = _formKey.currentState?.fields['email']?.value;
                                     final password = _formKey.currentState?.fields['password']?.value;
-                                    Authentication().handelUserLogin(email, password, context);
+
+                                    Authentication().handelUserRegistration(name, email, password, context);
+
                                   }
                                 },
-                                child: const Text('Login',style:TextStyle(color:Colors.white,fontWeight:FontWeight.w600,fontSize: 16)),
+                                child: const Text('Sign Up',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold,fontSize: 16)),
                               )
                             ],
                           ),
@@ -105,24 +132,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don't have account?"),
+                          const Text("Already have a account?"),
                           const SizedBox(width: 5,),
                           GestureDetector(onTap: (){
-                            if (Theme.of(context).platform == TargetPlatform.iOS) {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(builder: (context) => const SignInScreen()),
-                              );
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const SignInScreen()),
-                              );
-                            }
-                          }, child: const Text("Create one",style: TextStyle(color: Colors.blue))),
+                            Navigator.pop(context);
+                          }, child: const Text("Log In",style: TextStyle(color: Colors.blue))),
                         ],
-                      ),
-                      const SizedBox(height: 5,)
+                      )
                     ],
                   ),
                 ),

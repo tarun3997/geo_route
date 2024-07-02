@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geo_route/model/HomeVehicleModel.dart';
 import 'package:geo_route/server/api/authenticationApi.dart';
 import 'package:geo_route/widget/CarCard.dart';
-
+import 'AddVehicle.dart';
 import 'VehicleListScreen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +14,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  final List<HomeVehicleModel> homeVehicleModel = [
+    HomeVehicleModel(image: 'bike.png', cardTitle: "All vehicle", count: 28),
+    HomeVehicleModel(image: 'car.png', cardTitle: "All drivers", count: 28),
+    HomeVehicleModel(image: 'truck.png', cardTitle: "Connected GPS", count: 28),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,8 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-                itemCount: 10,
+                itemCount: homeVehicleModel.length,
                 itemBuilder: (context, index){
+                  HomeVehicleModel vehicleModel = homeVehicleModel[index];
+
                   return GestureDetector(onTap: (){
                     if (Theme.of(context).platform == TargetPlatform.iOS) {
                       Navigator.push(
@@ -59,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(builder: (context) => const VehicleListScreen()),
                       );
-                    }                  },child: const CarCard());
+                    }                  },
+                      child: CarCard(image: vehicleModel.image, cardTitle: vehicleModel.cardTitle, count: vehicleModel.count));
                 },
               )
             ],
@@ -68,10 +79,20 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
         floatingActionButton:  FloatingActionButton(
           backgroundColor: Colors.black,
-          onPressed: (){},
+          onPressed: (){
+            if (Theme.of(context).platform == TargetPlatform.iOS) {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (context) => const AddVehicleScreen()),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddVehicleScreen()),
+              );
+            }                  },
           child: const Icon(Icons.add,size: 36, color: Colors.white,),
         ),
     );
-
   }
 }

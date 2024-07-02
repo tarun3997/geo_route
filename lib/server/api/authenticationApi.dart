@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geo_route/screens/AuthScreens/Signup.dart';
 import 'package:geo_route/screens/HomeScreen.dart';
 import 'package:geo_route/server/url.dart';
 import 'package:geo_route/utils/Helper.dart';
+
+import '../../screens/AuthScreens/SignIn.dart';
 
 class Authentication{
   final Dio dio = Dio();
@@ -46,7 +47,7 @@ class Authentication{
 
   Future<void> handelUserLogout(context) async{
     Helper().setId('');
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const SignupScreen()), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const SignInScreen()), (route) => false);
 
   }
 }
