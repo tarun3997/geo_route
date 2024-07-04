@@ -2,7 +2,7 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/enums/VehicleType.dart';
 import 'package:geo_route/model/VehicleShortDetailModel.dart';
-import 'package:geo_route/widget/VehicleDetailsCard.dart';
+import 'package:geo_route/widget/VehicleDetailsScreenCard.dart';
 
 class VehicleListScreen extends StatefulWidget {
   const VehicleListScreen({super.key});
