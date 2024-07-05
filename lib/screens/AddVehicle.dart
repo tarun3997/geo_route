@@ -14,6 +14,8 @@ class AddVehicleScreen extends StatefulWidget {
 class _AddVehicleScreenState extends State<AddVehicleScreen> {
 
   final _formKey = GlobalKey<FormBuilderState>();
+  final List<String> vehicleOption = ['Motorcycle', 'Tom25', 'ALS', 'TATRA', 'WB', 'BUS', 'Safari', 'Scorpio'];
+  final List<String> fuelOption = ['diesel', 'petrol'];
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +46,20 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 10),
-                            textFieldDecor("nameOfDriver", "Name of driver"),
+                            textFieldDecor('nameOfDriver', 'Name of driver', TextInputType.text),
                             const SizedBox(height: 10),
-                            textFieldDecor("vehicleNumber", "Vehicle number"),
+                            textFieldDecor('vehicleNumber', 'Vehicle Number', TextInputType.text),
                             const SizedBox(height: 10),
-                            textFieldDecor("vehicleType", "Vehicle type"),
+                            dropDownDecor('vehicleType', 'Vehicle Type', vehicleOption),
                             const SizedBox(height: 10),
-                            textFieldDecor("parkingSlotNumber", "Parking slot number"),
+                            Row(
+                              children: [
+                                Expanded(child: dropDownDecor('fuelType', 'Fuel Type', fuelOption)),
+                                const SizedBox(width: 10),
+                                Expanded(child: textFieldDecor('distance', 'Distance', TextInputType.number)),
+                              ],
+                            ),
+
                             const SizedBox(height: 40,),
                             MaterialButton(
                               elevation: 4,
@@ -76,7 +85,40 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
       ),
     );
   }
-  Widget textFieldDecor(String name, String text){
+
+  Widget dropDownDecor(String name, String text, List<String> listOption) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        Material(
+          elevation: 3,
+          shadowColor: Colors.grey,
+          child: FormBuilderDropdown(
+            name: name,
+            decoration: InputDecoration(
+              hintText: text,
+              filled: true,
+              fillColor: Colors.white,
+              border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(3))
+              ),
+            ),
+            items: listOption
+                .map((option) => DropdownMenuItem(
+              value: option,
+              child: Text(option),
+            )).toList(),
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(),
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget textFieldDecor(String name, String text, TextInputType keyboardType){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -85,6 +127,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
           elevation: 3,
           shadowColor: Colors.grey,
           child: FormBuilderTextField(
+            keyboardType: keyboardType,
             name: name,
             decoration: InputDecoration(
               hintText: text,
