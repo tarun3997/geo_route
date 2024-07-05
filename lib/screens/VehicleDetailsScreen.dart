@@ -28,14 +28,14 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       body: Stack(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: MapmyIndiaMap(
+                height: MediaQuery.of(context).size.height,
+                child: MapmyIndiaMap(
 
-                initialCameraPosition: const CameraPosition(
-                  target: LatLng(24.594872, 73.72804),
-                  zoom: 14.0
-                ),
-              )
+                  initialCameraPosition: const CameraPosition(
+                      target: LatLng(24.594872, 73.72804),
+                      zoom: 14.0
+                  ),
+                )
             ),
             Padding(
               padding: const EdgeInsets.only(top: 12),
