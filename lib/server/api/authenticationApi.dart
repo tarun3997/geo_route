@@ -45,7 +45,7 @@ class Authentication{
     }
   }
 
-  Future<void> handelUserLogout(context) async{
+  Future<void> handleUserLogout(context) async{
     Helper().setId('');
     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const SignInScreen()), (route) => false);
 
