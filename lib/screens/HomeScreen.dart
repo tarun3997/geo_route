@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/model/HomeVehicleModel.dart';
 import 'package:geo_route/server/api/authenticationApi.dart';
+import 'package:geo_route/server/api/vehicleApi.dart';
+import 'package:geo_route/utils/ErrorHandler.dart';
 import 'package:geo_route/widget/CarCard.dart';
 import 'AddVehicle.dart';
 import 'VehicleListScreen.dart';
@@ -14,85 +16,145 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   final List<HomeVehicleModel> homeVehicleModel = [
-    HomeVehicleModel(image: 'bike.png', cardTitle: "All vehicle", count: 28),
-    HomeVehicleModel(image: 'car.png', cardTitle: "All drivers", count: 28),
-    HomeVehicleModel(image: 'truck.png', cardTitle: "Connected GPS", count: 28),
+    HomeVehicleModel(image: 'bike.png', cardTitle: "All vehicles", count: 0),
+    HomeVehicleModel(image: 'bike.png', cardTitle: "Two-wheeler", count: 0),
+    HomeVehicleModel(image: 'jeep.png', cardTitle: "Four-wheeler", count: 0),
+    HomeVehicleModel(image: 'truck.png', cardTitle: "Heavy vehicle", count: 0),
   ];
+
+  final VehicleApi vehicleApi = VehicleApi();
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchVehicleCount();
+  }
+
+  Future<void> fetchVehicleCount() async {
+    try {
+      final data = await vehicleApi.handleVehicleCount();
+      setState(() {
+        homeVehicleModel[0].count = data['total'] ?? 0;
+        homeVehicleModel[1].count = data['twoWheeler'] ?? 0;
+        homeVehicleModel[2].count = data['fourWheeler'] ?? 0;
+        homeVehicleModel[3].count = data['heavyVehicle'] ?? 0;
+        isLoading = false;
+      });
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, "Getting error in vehicle count $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: const Text("CMD PATH",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
+        title: const Text(
+          "CMD PATH",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
         actions: [
-
-          IconButton(onPressed: (){
-            Authentication().handelUserLogout(context);
-          }, icon: const Icon(Icons.notifications, color: Colors.black,)),
-          const CircleAvatar( radius: 16),
-          const SizedBox(width: 8)
+          IconButton(
+            onPressed: () {
+              Authentication().handleUserLogout(context);
+            },
+            icon: const Icon(Icons.notifications, color: Colors.black),
+          ),
+          const CircleAvatar(radius: 16),
+          const SizedBox(width: 8),
         ],
         elevation: 1,
         shadowColor: Colors.black,
       ),
-      body: SingleChildScrollView(
+      body: isLoading
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (Theme.of(context).platform == TargetPlatform.iOS)
+              const CupertinoActivityIndicator(radius: 20)
+            else
+              const CircularProgressIndicator(),
+          ],
+        ),
+      )
+          : SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          child:  Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Text("Vehicles:", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),),
+                child: Text(
+                  "Vehicles:",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
               ),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                ),
                 itemCount: homeVehicleModel.length,
-                itemBuilder: (context, index){
+                itemBuilder: (context, index) {
                   HomeVehicleModel vehicleModel = homeVehicleModel[index];
 
-                  return GestureDetector(onTap: (){
-                    if (Theme.of(context).platform == TargetPlatform.iOS) {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(builder: (context) => const VehicleListScreen()),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const VehicleListScreen()),
-                      );
-                    }                  },
-                      child: CarCard(image: vehicleModel.image, cardTitle: vehicleModel.cardTitle, count: vehicleModel.count));
+                  return GestureDetector(
+                    onTap: () {
+                      if (Theme.of(context).platform == TargetPlatform.iOS) {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(builder: (context) => const VehicleListScreen()),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const VehicleListScreen()),
+                        );
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(2.0),
+                      child: CarCard(
+                        image: vehicleModel.image,
+                        cardTitle: vehicleModel.cardTitle,
+                        count: vehicleModel.count,
+                      ),
+                    ),
+                  );
                 },
-              )
+              ),
             ],
           ),
         ),
       ),
-        floatingActionButton:  FloatingActionButton(
-          backgroundColor: Colors.black,
-          onPressed: (){
-            if (Theme.of(context).platform == TargetPlatform.iOS) {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(builder: (context) => const AddVehicleScreen()),
-              );
-            } else {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddVehicleScreen()),
-              );
-            }                  },
-          child: const Icon(Icons.add,size: 36, color: Colors.white,),
-        ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
+        onPressed: () {
+          if (Theme.of(context).platform == TargetPlatform.iOS) {
+            Navigator.push(
+              context,
+              CupertinoPageRoute(builder: (context) => const AddVehicleScreen()),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const AddVehicleScreen()),
+            );
+          }
+        },
+        child: const Icon(Icons.add, size: 36, color: Colors.white),
+      ),
     );
   }
 }

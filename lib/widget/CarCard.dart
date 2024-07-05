@@ -11,6 +11,7 @@ class CarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+
       child: SizedBox(
         width: MediaQuery.of(context).size.width /2,
         height: 50,

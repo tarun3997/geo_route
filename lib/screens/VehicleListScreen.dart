@@ -2,6 +2,8 @@ import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/enums/VehicleType.dart';
 import 'package:geo_route/model/VehicleShortDetailModel.dart';
+import 'package:geo_route/server/api/vehicleApi.dart';
+import 'package:geo_route/utils/ErrorHandler.dart';
 import 'package:geo_route/widget/VehicleDetailsScreenCard.dart';
 
 class VehicleListScreen extends StatefulWidget {
@@ -74,10 +76,25 @@ class _VehicleListScreenState extends State<VehicleListScreen> with SingleTicker
       todayKm: 7.0,
     ),
   ];
+  final VehicleApi vehicleApi = VehicleApi();
+
   @override
   void dispose() {
     tabController.dispose();
+    fetchVehicleList();
     super.dispose();
+  }
+
+  Future<void> fetchVehicleList() async {
+    print("Run code 2");
+
+    try {
+      final data = await vehicleApi.handleVehicleList();
+     print(data);
+    } catch (e) {
+      ErrorHandler.showSnackBar(context, "Getting error in vehicle count $e");
+
+    }
   }
 
   TextEditingController textController = TextEditingController();
