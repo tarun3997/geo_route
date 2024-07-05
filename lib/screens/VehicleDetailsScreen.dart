@@ -27,8 +27,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
       appBar: AppBar(title: const Text("MAP"), elevation: 5, shadowColor: Colors.grey,),
       body: Stack(
           children: [
-            Container(
-                color: Colors.red,
+            SizedBox(
                 height: MediaQuery.of(context).size.height,
                 child: MapmyIndiaMap(
 
