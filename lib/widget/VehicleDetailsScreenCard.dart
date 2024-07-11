@@ -4,14 +4,19 @@ import 'package:geo_route/enums/VehicleType.dart';
 import 'package:geo_route/screens/VehicleDetailsScreen.dart';
 
 class VehicleDetailsCard extends StatefulWidget {
+  final String id;
   final VehicleType? type;
   final String? vehicleNumber;
-  final double? distance;
+  final int? distance;
   final int? runTime;
   final int? remainingKm;
   final String? currentLocation;
-  final double? todayKm;
-  const VehicleDetailsCard({super.key, this.type ,this.vehicleNumber, this.distance, this.runTime, this.remainingKm, this.currentLocation, this.todayKm});
+  final int? todayKm;
+  final String? updatedTime;
+  final double lat;
+  final double lng;
+  final bool isActive;
+  const VehicleDetailsCard({super.key, this.updatedTime, this.type ,this.vehicleNumber, this.distance, this.runTime, this.remainingKm, this.currentLocation, this.todayKm, required this.lat, required this.lng, required this.isActive, required this.id});
 
   @override
   State<VehicleDetailsCard> createState() => _VehicleDetailsCardState();
@@ -23,9 +28,9 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
     return GestureDetector(
       onTap: (){
         if(Theme.of(context).platform == TargetPlatform.iOS){
-        Navigator.push(context, CupertinoPageRoute(builder: (context) => const VehicleDetailsScreen()));
+        Navigator.push(context, CupertinoPageRoute(builder: (context) =>  VehicleDetailsScreen(id: widget.id,)));
         }else{
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const VehicleDetailsScreen()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) =>  VehicleDetailsScreen(id: widget.id,)));
         }
       },
       child: Container(
@@ -54,7 +59,7 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                     Text("${widget.vehicleNumber}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-                    const Text("In-Active",style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),),
+                      Text(widget.isActive ? "Not-Active" : "In-Active",style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),),
                   ],)
                 ],
               ),
@@ -95,7 +100,7 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text("${widget.currentLocation}",style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),maxLines: 2,overflow: TextOverflow.ellipsis,textAlign: TextAlign.center,),
-                        const Text("updated at 9:00 am",style: TextStyle(color: Colors.white, fontSize: 12)),
+                        Text("updated at ${widget.updatedTime}",style: const TextStyle(color: Colors.white, fontSize: 12)),
                       ],
                     ),
                   ),
