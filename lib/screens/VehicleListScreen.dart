@@ -1,221 +1,242 @@
 import 'package:anim_search_bar/anim_search_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/enums/VehicleType.dart';
 import 'package:geo_route/model/VehicleShortDetailModel.dart';
 import 'package:geo_route/server/api/vehicleApi.dart';
-import 'package:geo_route/utils/ErrorHandler.dart';
 import 'package:geo_route/widget/VehicleDetailsScreenCard.dart';
 
 class VehicleListScreen extends StatefulWidget {
-  const VehicleListScreen({super.key});
+  final int initialIndex;
+
+  const VehicleListScreen({super.key, required this.initialIndex});
 
   @override
   State<VehicleListScreen> createState() => _VehicleListScreenState();
 }
 
-class _VehicleListScreenState extends State<VehicleListScreen> with SingleTickerProviderStateMixin {
+class _VehicleListScreenState extends State<VehicleListScreen>
+    with SingleTickerProviderStateMixin {
   late TabController tabController;
+  final VehicleApi vehicleApi = VehicleApi();
+  late Future<List<VehicleShortDetailModel>> vehicleShortDetailModel;
+  List<VehicleShortDetailModel> _searchResult = [];
+  bool isSearching = false;
+
   @override
   void initState() {
-    tabController = TabController(length: 3, vsync: this, initialIndex: 0);
+    tabController = TabController(length: 3, vsync: this, initialIndex: widget.initialIndex);
+    vehicleShortDetailModel = vehicleApi.handleVehicleList();
+
     super.initState();
   }
-  final List<VehicleShortDetailModel> vehicleDetails = [
-    VehicleShortDetailModel(
-      type: VehicleType.bike,
-      vehicleNumber: "RJ30CA3997",
-      distance: 30.0,
-      runTime: 20,
-      currentLocation: "Parshal highway side road, pune maharashtra",
-      remainingKm: 10,
-      todayKm: 2.5,
-    ),
-    VehicleShortDetailModel(
-      type: VehicleType.car,
-      vehicleNumber: "MH12AB1234",
-      distance: 50.0,
-      runTime: 30,
-      currentLocation: "Katraj highway, pune maharashtra",
-      remainingKm: 20,
-      todayKm: 5.0,
-    ),
-    VehicleShortDetailModel(
-      type: VehicleType.truck,
-      vehicleNumber: "GJ01CD5678",
-      distance: 100.0,
-      runTime: 45,
-      currentLocation: "Nagar road, pune maharashtra",
-      remainingKm: 30,
-      todayKm: 10.0,
-    ),
-    VehicleShortDetailModel(
-      type: VehicleType.truck,
-      vehicleNumber: "UP90EF9012",
-      distance: 200.0,
-      runTime: 60,
-      currentLocation: "Solapur highway, pune maharashtra",
-      remainingKm: 40,
-      todayKm: 15.0,
-    ),
-    VehicleShortDetailModel(
-      type: VehicleType.bike,
-      vehicleNumber: "RJ45GH6789",
-      distance: 25.0,
-      runTime: 18,
-      currentLocation: "Aundh road, pune maharashtra",
-      remainingKm: 12,
-      todayKm: 3.0,
-    ),
-    VehicleShortDetailModel(
-      type: VehicleType.car,
-      vehicleNumber: "MH67IJ3456",
-      distance: 70.0,
-      runTime: 35,
-      currentLocation: "Baner road, pune maharashtra",
-      remainingKm: 25,
-      todayKm: 7.0,
-    ),
-  ];
-  final VehicleApi vehicleApi = VehicleApi();
 
   @override
   void dispose() {
     tabController.dispose();
-    fetchVehicleList();
     super.dispose();
   }
 
-  Future<void> fetchVehicleList() async {
-    print("Run code 2");
+  TextEditingController textController = TextEditingController();
+  final TextStyle textStyle = const TextStyle(
+      fontSize: 18, color: Colors.black, fontWeight: FontWeight.w600);
 
-    try {
-      final data = await vehicleApi.handleVehicleList();
-     print(data);
-    } catch (e) {
-      ErrorHandler.showSnackBar(context, "Getting error in vehicle count $e");
-
+  void _searchVehicle(String query) async {
+    final allVehicles = await vehicleShortDetailModel;
+    if (query.isEmpty) {
+      setState(() {
+        isSearching = false;
+        _searchResult.clear();
+      });
+    } else {
+      final filteredResult = allVehicles
+          .where((vehicle) =>
+          vehicle.vehicleNumber!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+      setState(() {
+        isSearching = true;
+        _searchResult = filteredResult;
+      });
     }
   }
 
-  TextEditingController textController = TextEditingController();
-  final TextStyle textStyle = const TextStyle(fontSize: 18,color: Colors.black, fontWeight: FontWeight.w600);
+  void _clearSearch() {
+    setState(() {
+      textController.clear();
+      _searchResult = [];
+      isSearching = false;
+    });
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      vehicleShortDetailModel = vehicleApi.handleVehicleList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: (){
-          Navigator.pop(context);
-        }, icon: const Icon(Icons.arrow_back_rounded)),
-        title: const Text("All Vehicles", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(Icons.arrow_back_rounded)),
+        title: const Text(
+          "All Vehicles",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
         actions: [
-          AnimSearchBar(width: MediaQuery.sizeOf(context).width, textController: textController, onSuffixTap: (){
-            setState(() {
-              textController.clear();
-            });
-          }, onSubmitted: (String value) {
-          },
-            color: Colors.transparent,
-            boxShadow: false,
-          )
+          if (_searchResult.isNotEmpty || isSearching)
+            IconButton(
+              onPressed: _clearSearch,
+              icon: const Icon(Icons.cancel_outlined),
+            )
+          else
+            AnimSearchBar(
+              width: MediaQuery.sizeOf(context).width,
+              textController: textController,
+              closeSearchOnSuffixTap: false,
+              helpText: "Search by vehicle number",
+              onSuffixTap: _clearSearch,
+              onSubmitted: _searchVehicle,
+              color: Colors.transparent,
+              boxShadow: false,
+            ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child:   SizedBox(
-            height: MediaQuery.of(context).size.height - kToolbarHeight,
-
-            child: Column(
-              children: [
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height - kToolbarHeight,
+          child: Column(
+            children: [
               TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              indicatorWeight: 3,
-              indicatorColor: Colors.black,
-              indicator: const UnderlineTabIndicator(
-                borderRadius: BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10)),
-                borderSide: BorderSide(color: Colors.black,width: 3)
-
-              ),
-              indicatorPadding: const EdgeInsets.symmetric(horizontal: 12),
-              controller: tabController,
-              tabs: [
-                Tab(child: Text("Car", style: textStyle,),),
-                Tab(child: Text("Bike", style: textStyle,)),
-                Tab(child: Text("Truck", style: textStyle,)),
-              ],
-            ),
-                Flexible(
-
-                  child: TabBarView(
-                    controller: tabController,
-                    children: [
-                      ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: vehicleDetails.where((vehicle) => vehicle.type == VehicleType.car).length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index){
-                            final vehicle = vehicleDetails.where((vehicle) => vehicle.type == VehicleType.car).elementAt(index);
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                              child: VehicleDetailsCard(
-                                type: vehicle.type,
-                                currentLocation: vehicle.currentLocation,
-                                distance: vehicle.distance,
-                                remainingKm: vehicle.remainingKm,
-                                runTime: vehicle.runTime,
-                                todayKm: vehicle.todayKm,
-                                vehicleNumber: vehicle.vehicleNumber,
-                              ),
-                            );
-                          }
-                      ),
-                      ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: vehicleDetails.where((vehicle) => vehicle.type == VehicleType.bike).length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index){
-                            final vehicle = vehicleDetails.where((vehicle) => vehicle.type == VehicleType.bike).elementAt(index);
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                              child: VehicleDetailsCard(
-                                type: vehicle.type,
-                                currentLocation: vehicle.currentLocation,
-                                distance: vehicle.distance,
-                                remainingKm: vehicle.remainingKm,
-                                runTime: vehicle.runTime,
-                                todayKm: vehicle.todayKm,
-                                vehicleNumber: vehicle.vehicleNumber,
-                              ),
-                            );
-                          }
-                      ),
-                      ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: vehicleDetails.where((vehicle) => vehicle.type == VehicleType.truck).length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index){
-                            final vehicle = vehicleDetails.where((vehicle) => vehicle.type == VehicleType.truck).elementAt(index);
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                              child: VehicleDetailsCard(
-                                type: vehicle.type,
-                                currentLocation: vehicle.currentLocation,
-                                distance: vehicle.distance,
-                                remainingKm: vehicle.remainingKm,
-                                runTime: vehicle.runTime,
-                                todayKm: vehicle.todayKm,
-                                vehicleNumber: vehicle.vehicleNumber,
-                              ),
-                            );
-                          }
-                      ),
-                    ],
+                indicatorSize: TabBarIndicatorSize.tab,
+                indicatorWeight: 3,
+                indicatorColor: Colors.black,
+                indicator: const UnderlineTabIndicator(
+                    borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(10),
+                        topLeft: Radius.circular(10)),
+                    borderSide: BorderSide(color: Colors.black, width: 3)),
+                indicatorPadding: const EdgeInsets.symmetric(horizontal: 12),
+                controller: tabController,
+                tabs: [
+                  Tab(
+                    child: Text(
+                      "Car",
+                      style: textStyle,
+                    ),
                   ),
-                ),
-              ],
-            ),
+                  Tab(
+                      child: Text(
+                        "Bike",
+                        style: textStyle,
+                      )),
+                  Tab(
+                      child: Text(
+                        "Truck",
+                        style: textStyle,
+                      )),
+                ],
+              ),
+              FutureBuilder<List<VehicleShortDetailModel>>(
+                future: isSearching
+                    ? Future.value(_searchResult)
+                    : vehicleShortDetailModel,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Expanded(
+                      child: Center(
+                        child: Theme.of(context).platform == TargetPlatform.iOS
+                            ? const CupertinoActivityIndicator(radius: 20)
+                            : const CircularProgressIndicator(),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Expanded(
+                      child: Center(
+                        child: Text('No vehicles available'),
+                      ),
+                    );
+                  } else {
+                    final List<VehicleShortDetailModel> data = snapshot.data!;
+                    if (isSearching && _searchResult.isEmpty) {
+                      return const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'No vehicles found',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return Flexible(
+                      child: TabBarView(
+                        controller: tabController,
+                        children: [
+                          _buildVehicleList(
+                              data, VehicleType.car, textStyle),
+                          _buildVehicleList(
+                              data, VehicleType.bike, textStyle),
+                          _buildVehicleList(
+                              data, VehicleType.truck, textStyle),
+                        ],
+                      ),
+                    );
+                  }
+                },
+              )
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildVehicleList(List<VehicleShortDetailModel> data,
+      VehicleType type, TextStyle textStyle) {
+    final vehicles = data.where((vehicle) => vehicle.type == type).toList();
+    if (vehicles.isEmpty) {
+      return Center(
+        child: Text('No ${type.name}s are available', style: textStyle),
+      );
+    }
+    return RefreshIndicator(
+      onRefresh: _refreshData,
+      child: ListView.builder(
+        itemCount: vehicles.length,
+        shrinkWrap: true,
+        itemBuilder: (context, index) {
+          final vehicle = vehicles[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            child: VehicleDetailsCard(
+              id: vehicle.id,
+              lng: vehicle.lng,
+              lat: vehicle.lat,
+              type: vehicle.type,
+              currentLocation: vehicle.currentLocation,
+              distance: vehicle.distance,
+              remainingKm: vehicle.remainingKm,
+              runTime: vehicle.runTime,
+              todayKm: vehicle.todayKm,
+              vehicleNumber: vehicle.vehicleNumber,
+              updatedTime: vehicle.updatedTime,
+              isActive: vehicle.isActive,
+            ),
+          );
+        },
       ),
     );
   }

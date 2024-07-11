@@ -51,5 +51,6 @@
 	<string>Track device location</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Map need your location to show you other user</string>
+
 </dict>
 </plist>
