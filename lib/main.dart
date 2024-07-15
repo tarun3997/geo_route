@@ -47,7 +47,8 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
 
       ),
-      home: id.isEmpty ? const SignupScreen() : const HomeScreen()
+        // id.isEmpty ? const SignupScreen() :
+      home:  const HomeScreen()
     );
   }
 }
