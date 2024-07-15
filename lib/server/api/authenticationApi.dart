@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:geo_route/screens/HomeScreen.dart';
 import 'package:geo_route/server/url.dart';
-import 'package:geo_route/utils/ErrorHandler.dart';
 import 'package:geo_route/utils/Helper.dart';
-import 'package:geo_route/utils/NavigationUtils.dart';
 
 import '../../screens/AuthScreens/SignIn.dart';
 
@@ -17,14 +17,14 @@ class Authentication{
         "password": password
       });
       if(response.statusCode == 201){
-        String id = response.data['id'];
-        Helper().setId(id);
-        NavigationUtils.navigatorPushAndRemoveUntil(context, const HomeScreen());
+      String id = response.data['id'];
+      Helper().setId(id);
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const HomeScreen()), (route) => false);
       }else{
-        ErrorHandler.showSnackBar(context, "Getting error in registration");
+        print("Getting error");
       }
     }catch(e){
-      ErrorHandler.showSnackBar(context, "Getting error in registration $e");
+      print("Getting error in registration");
     }
   }
   Future<void> handelUserLogin(String? email, String? password, context) async{
@@ -36,17 +36,18 @@ class Authentication{
       if(response.statusCode == 200){
         String id = response.data['id'];
         Helper().setId(id);
-        NavigationUtils.navigatorPushAndRemoveUntil(context, const HomeScreen());
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const HomeScreen()), (route) => false);
       }else{
-        ErrorHandler.showSnackBar(context, "Getting error in login");
+        print("Getting error");
       }
     }catch(e){
-      ErrorHandler.showSnackBar(context, "Getting error in login $e");
+      print("Getting error in login $e");
     }
   }
 
   Future<void> handleUserLogout(context) async{
     Helper().setId('');
-    NavigationUtils.navigatorPushAndRemoveUntil(context, const SignInScreen());
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const SignInScreen()), (route) => false);
+
   }
 }
