@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/model/VehicleDetailsModel.dart';
 import 'package:geo_route/server/api/vehicleApi.dart';
+import 'package:geo_route/server/services/mapmyindia_config.dart';
+import 'package:geo_route/utils/Gap.dart';
 import 'package:mapmyindia_gl/mapmyindia_gl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -22,12 +24,10 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   @override
   void initState() {
-    MapmyIndiaAccountManager.setMapSDKKey("19447b84be06954492dce18a5abbc654");
-    MapmyIndiaAccountManager.setRestAPIKey("19447b84be06954492dce18a5abbc654");
-    MapmyIndiaAccountManager.setAtlasClientId(
-        "96dHZVzsAuvPF322Zvhn9pRNquQizpxDitB6faHTrwJg2yEO1EEb5rnRLcEBAKip34-4hpVk0Pubjtsz49SLdGW08B6fJWzm");
-    MapmyIndiaAccountManager.setAtlasClientSecret(
-        "lrFxI-iSEg9ZcqIkAkL3JWJfL7vTBwUpUqBnKgTADRHTzvDzXpaBl_yYz6TYqjCZJ8k84mDlbjDl5yCHfBICvciQPx8f_t7hGI1l1midBmM=");
+    MapmyIndiaAccountManager.setMapSDKKey(mapMyIndiaMapSdkKey);
+    MapmyIndiaAccountManager.setRestAPIKey(mapMyIndiaRestApiKey);
+    MapmyIndiaAccountManager.setAtlasClientId(mapMyIndiaAtlasClientId);
+    MapmyIndiaAccountManager.setAtlasClientSecret(mapMyIndiaAtlasClientSecret);
     vehicleDetailsFuture = vehicleApi.getVehicleDetailsById(id: widget.id);
     super.initState();
   }
@@ -147,35 +147,275 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                         ),
                         child: Column(
                           children: [
-                            const SizedBox(height: 17),
-                            Text(
-                              vehicleDetails.driverName ?? "Unknown driver",
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Divider(
-                              thickness: 1.5,
+                            Container(
+                              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    vehicleDetails.vehicleNumber ?? "Unknown Vehicle",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                          Row(
+                                            children: [
+                                              const Icon(CupertinoIcons.person, size: 18,),
+                                              Text(vehicleDetails.driverName ?? "Unknown driver"),
+                                            ],
+                                          ),
+                                      Row(
+                                        children: [
+                                      const Icon(Icons.timer_outlined, size: 16,),
+                                      Text(" ${vehicleDetails.updatedTime}", style: const TextStyle(fontSize: 12),)
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                            const Divider(
+                              thickness: 0.3,
                               color: Colors.black,
-                              indent: MediaQuery.of(context).size.width / 6,
-                              endIndent: MediaQuery.of(context).size.width / 6,
+                            ),
+                                ],
+                              ),
                             ),
                             Expanded(
                               child: SingleChildScrollView(
                                 controller: scrollController,
-                                child: Column(
-                                  children: [
-                                    vehicleDetailCard(
-                                        context: context,
-                                        title: "Current Status"),
-                                    vehicleDetailCard(
-                                        context: context, title: "Vehicle"),
-                                    vehicleDetailCard(
-                                        context: context, title: "Distance"),
-                                    vehicleDetailCard(
-                                        context: context, title: "GPS"),
-                                  ],
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Image.asset("assets/${vehicleDetails.vehicleType.toString().split('.').last}.png",width: 54,),
+                                          const SizedBox(width: 16,),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(vehicleDetails.vehicleName ?? "N/A", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),),
+                                              Text(vehicleDetails.isActive! ? "Active" : "In-Active", style: const TextStyle(fontSize: 12),),
+                                            ],
+                                          ),
+                                            ],
+                                          ),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  const Icon(Icons.local_gas_station_outlined, size: 18,),
+                                              Text(":- ${vehicleDetails.vehicleFuelType}" ?? "N/A", style: const TextStyle(fontSize: 12),)
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  const Icon(Icons.sim_card_outlined, size: 18,),
+                                              Text(":- ${vehicleDetails.id}" ?? "N/A", style: const TextStyle(fontSize: 12),)
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+
+                                        ],
+                                      ),
+                                      const Gap(16),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.location_on_outlined),
+                                          const SizedBox(width: 8,),
+                                          Expanded(
+                                            child: Text(
+                                              vehicleDetails.currentLocation ?? "",
+                                              overflow: TextOverflow.visible,
+                                              softWrap: true,
+                                              style: const TextStyle(color: Colors.black, fontSize: 16),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      // vehicleDetailCard(
+                                      //     context: context,
+                                      //     title: "Vehicle Info",
+                                      //   valueTitle: "Total run",
+                                      //   value: "${vehicleDetails.vehicleRunKM}",
+                                      //   type: "Km",
+                                      //
+                                      // ),
+                                      const Gap(12),
+                                      Card(
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(3),
+                                            topLeft: Radius.circular(3),
+                                          ),
+                                        ),
+                                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                                        color: Colors.white,
+                                        elevation: 2,
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: 30,
+                                              width: MediaQuery.of(context).size.width,
+                                              decoration: const BoxDecoration(
+                                                color: Color(0xff363333),
+                                              ),
+                                              child: const Center(
+                                                child: Text(
+                                                  "Vehicle Info",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                children: [
+                                                  cardData(title: "Total Run", value: "${vehicleDetails.vehicleRunKM}", type:"Km"),
+                                                  const SizedBox(
+                                                    height: 24,
+                                                    child: VerticalDivider(),
+                                                  ),
+                                                  cardData(title: "Limit Left", value: "50", type: "Km"),
+                                                  const SizedBox(
+                                                    height: 24,
+                                                    child: VerticalDivider(),
+                                                  ),
+                                                  cardData(title: "Limit", value: "${vehicleDetails.vehicleKMLimit}", type:"Km" )
+                                                ],
+                                              ),
+                                            ),
+                                            const Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text("Edit Limit", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                Icon(Icons.arrow_forward_ios_outlined, size: 12,),
+                                              ],
+                                            ),
+                                                const Gap(6)
+                                          ],
+                                        ),
+                                      ),
+                                      const Gap(12),
+                                      Card(
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(3),
+                                            topLeft: Radius.circular(3),
+                                          ),
+                                        ),
+                                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                                        color: Colors.white,
+                                        elevation: 2,
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: 30,
+                                              width: MediaQuery.of(context).size.width,
+                                              decoration: const BoxDecoration(
+                                                color: Color(0xff363333),
+                                              ),
+                                              child: const Center(
+                                                child: Text(
+                                                  "Speed Info",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                children: [
+                                                  cardData(title: "Avg Speed", value: "38", type:"Km/h"),
+                                                  const SizedBox(
+                                                    height: 24,
+                                                    child: VerticalDivider(),
+                                                  ),
+                                                  cardData(title: "Max Speed", value: "68", type: "Km/h"),
+                                                  const SizedBox(
+                                                    height: 24,
+                                                    child: VerticalDivider(),
+                                                  ),
+                                                  cardData(title: "Behavior", value: "Good", type:"😃" )
+                                                ],
+                                              ),
+                                            ),
+
+                                          ],
+                                        ),
+                                      ),
+                                      const Gap(12),
+                                      Card(
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(3),
+                                            topLeft: Radius.circular(3),
+                                          ),
+                                        ),
+                                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                                        color: Colors.white,
+                                        elevation: 2,
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              height: 30,
+                                              width: MediaQuery.of(context).size.width,
+                                              decoration: const BoxDecoration(
+                                                color: Color(0xff363333),
+                                              ),
+                                              child: const Center(
+                                                child: Text(
+                                                  "Fuel Info",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                children: [
+                                                  cardData(title: "Refueled on", value: "12/07/2023", type:""),
+                                                  const SizedBox(
+                                                    height: 24,
+                                                    child: VerticalDivider(),
+                                                  ),
+                                                  cardData(title: "Mileage", value: "8", type: "kmpl"),
+
+                                                ],
+                                              ),
+                                            ),
+
+                                          ],
+                                        ),
+                                      ),
+
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -194,72 +434,69 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   }
 }
 
-Widget vehicleDetailCard({required BuildContext context, required String title}) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-    child: Card(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(3),
-          topLeft: Radius.circular(3),
-        ),
+Widget vehicleDetailCard({required BuildContext context, required String title, required String valueTitle,required String value, required String type }) {
+  return Card(
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.only(
+        topRight: Radius.circular(3),
+        topLeft: Radius.circular(3),
       ),
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      color: Colors.white,
-      elevation: 5,
-      child: Column(
-        children: [
-          Container(
-            height: 30,
-            width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(
-              color: Color(0xff363333),
-            ),
-            child: Center(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 18,
-                ),
+    ),
+    clipBehavior: Clip.antiAliasWithSaveLayer,
+    color: Colors.white,
+    elevation: 2,
+    child: Column(
+      children: [
+        Container(
+          height: 30,
+          width: MediaQuery.of(context).size.width,
+          decoration: const BoxDecoration(
+            color: Color(0xff363333),
+          ),
+          child: Center(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: 18,
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                cardData(title: "Distance", value: "40km"),
-                const SizedBox(
-                  height: 24,
-                  child: VerticalDivider(),
-                ),
-                cardData(title: "Run time", value: "6hr"),
-                const SizedBox(
-                  height: 24,
-                  child: VerticalDivider(),
-                ),
-                cardData(title: "KM left", value: "10km")
-              ],
-            ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              cardData(title: valueTitle, value: value, type:type),
+              const SizedBox(
+                height: 24,
+                child: VerticalDivider(),
+              ),
+              cardData(title: valueTitle, value: value, type: type),
+              const SizedBox(
+                height: 24,
+                child: VerticalDivider(),
+              ),
+              cardData(title: valueTitle, value: value, type:type )
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     ),
   );
 }
 
-Widget cardData({required String title, required String value}) {
+Widget cardData({required String title, required String value, required String type}) {
   return Column(
     children: [
       Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 17),
+        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14, color: Colors.black),
       ),
-      Text(value),
+      Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+      Text(type),
     ],
   );
 }

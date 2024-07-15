@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/enums/VehicleType.dart';
 import 'package:geo_route/screens/VehicleDetailsScreen.dart';
+import 'package:geo_route/utils/NavigationUtils.dart';
 
 class VehicleDetailsCard extends StatefulWidget {
   final String id;
@@ -27,14 +28,9 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        if(Theme.of(context).platform == TargetPlatform.iOS){
-        Navigator.push(context, CupertinoPageRoute(builder: (context) =>  VehicleDetailsScreen(id: widget.id,)));
-        }else{
-          Navigator.push(context, MaterialPageRoute(builder: (context) =>  VehicleDetailsScreen(id: widget.id,)));
-        }
+          NavigationUtils.navigatorPush(context, VehicleDetailsScreen(id: widget.id));
       },
       child: Container(
-
         decoration: const BoxDecoration(
           color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -75,7 +71,7 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
                     height: 24,
                     child: VerticalDivider(),
                   ),
-                  shortDetails(title: "Run Time", value: "${widget.runTime}hrs"),
+                  shortDetails(title: "Run Time", value: "${widget.runTime} hrs"),
                   const SizedBox(
                     height: 24,
                     child: VerticalDivider(),

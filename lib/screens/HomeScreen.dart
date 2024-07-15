@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geo_route/enums/NetworkStatus.dart';
 import 'package:geo_route/model/HomeVehicleModel.dart';
 import 'package:geo_route/screens/NotificationScreen.dart';
 import 'package:geo_route/server/api/authenticationApi.dart';
 import 'package:geo_route/server/api/vehicleApi.dart';
+import 'package:geo_route/server/services/NetworkServices.dart';
 import 'package:geo_route/utils/ErrorHandler.dart';
+import 'package:geo_route/utils/NavigationUtils.dart';
 import 'package:geo_route/widget/CarCard.dart';
 import 'AddVehicle.dart';
 import 'VehicleListScreen.dart';
@@ -17,6 +20,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  NetworkStatus _networkStatus = NetworkStatus.Unknown;
+  final NetworkServices _networkServices = NetworkServices();
+
   final List<HomeVehicleModel> homeVehicleModel = [
     HomeVehicleModel(image: 'bike.png', cardTitle: "All vehicles", count: 0),
     HomeVehicleModel(image: 'bike.png', cardTitle: "Two-wheeler", count: 0),
@@ -27,12 +34,20 @@ class _HomeScreenState extends State<HomeScreen> {
   final VehicleApi vehicleApi = VehicleApi();
   bool isLoading = true;
 
+
   @override
   void initState() {
     super.initState();
     fetchVehicleCount();
+    checkInternet();
   }
 
+  void checkInternet()async{
+    NetworkStatus status = await _networkServices.checkConnectivity();
+    setState(() {
+      _networkStatus = status;
+    });
+  }
   Future<void> fetchVehicleCount() async {
     try {
       final data = await vehicleApi.handleVehicleCount();
@@ -62,26 +77,26 @@ class _HomeScreenState extends State<HomeScreen> {
     showCupertinoModalPopup(
         context: context,
         builder: (BuildContext context) => CupertinoActionSheet(
-          actions: <CupertinoActionSheetAction>[
-            CupertinoActionSheetAction(
-              child: const Text('Setting'),
-              onPressed: () {},
-            ),
-            CupertinoActionSheetAction(
-              child: const Text('Logout'),
-              onPressed: () {
-                Navigator.pop(context);
-                Authentication().handleUserLogout(context);
-              },
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ));
+              actions: <CupertinoActionSheetAction>[
+                CupertinoActionSheetAction(
+                  child: const Text('Setting'),
+                  onPressed: () {},
+                ),
+                CupertinoActionSheetAction(
+                  child: const Text('Logout'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Authentication().handleUserLogout(context);
+                  },
+                ),
+              ],
+              cancelButton: CupertinoActionSheetAction(
+                child: const Text('Cancel'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ));
   }
 
   @override
@@ -90,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         centerTitle: false,
         title: const Text(
-          "CMD PATH",
+          "Geo Route",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
@@ -121,24 +136,26 @@ class _HomeScreenState extends State<HomeScreen> {
               radius: 18,
               child: Theme.of(context).platform == TargetPlatform.iOS
                   ? const Icon(Icons.person, size: 26)
-                  : PopupMenuButton(
-                icon: const Icon(
-                  Icons.person,
-                  size: 26,
-                ),
-                itemBuilder: (context) {
-                  return [
-                    const PopupMenuItem(
-                        value: 'setting', child: Text('Setting')),
-                    PopupMenuItem(
-                        onTap: () {
-                          Authentication().handleUserLogout(context);
+                  : Center(
+                      child: PopupMenuButton(
+                        icon: const Icon(
+                          Icons.person,
+                          size: 26,
+                        ),
+                        itemBuilder: (context) {
+                          return [
+                            const PopupMenuItem(
+                                value: 'setting', child: Text('Setting')),
+                            PopupMenuItem(
+                                onTap: () {
+                                  Authentication().handleUserLogout(context);
+                                },
+                                value: 'logout',
+                                child: const Text('Logout')),
+                          ];
                         },
-                        value: 'logout',
-                        child: const Text('Logout')),
-                  ];
-                },
-              ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(width: 8),
@@ -146,34 +163,23 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 1,
         shadowColor: Colors.black,
       ),
-      body: isLoading
+      body:  isLoading
           ? Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (Theme.of(context).platform == TargetPlatform.iOS)
-              const CupertinoActivityIndicator(radius: 20)
-            else
-              const CircularProgressIndicator(),
-          ],
-        ),
-      )
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (Theme.of(context).platform == TargetPlatform.iOS)
+                    const CupertinoActivityIndicator(radius: 20)
+                  else
+                    const CircularProgressIndicator(),
+                ],
+              ),
+            )
           : _buildRefreshableContent(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         onPressed: () {
-          if (Theme.of(context).platform == TargetPlatform.iOS) {
-            Navigator.push(
-              context,
-              CupertinoPageRoute(
-                  builder: (context) => const AddVehicleScreen()),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddVehicleScreen()),
-            );
-          }
+          NavigationUtils.navigatorPush(context, const AddVehicleScreen());
         },
         child: const Icon(Icons.add, size: 36, color: Colors.white),
       ),
@@ -192,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
               [
                 Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,13 +215,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                         ),
                         itemCount: homeVehicleModel.length,
                         itemBuilder: (context, index) {
                           HomeVehicleModel vehicleModel =
-                          homeVehicleModel[index];
+                              homeVehicleModel[index];
                           return GestureDetector(
                             onTap: () {
                               int initialIndex;
@@ -236,14 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   initialIndex = 0;
                                   break;
                               }
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                    builder: (context) =>
-                                        VehicleListScreen(
-                                          initialIndex: initialIndex,
-                                        )),
-                              );
+                              NavigationUtils.navigatorPush(context, VehicleListScreen(initialIndex: initialIndex));
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(2.0),
@@ -311,13 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => VehicleListScreen(
-                                initialIndex: initialIndex,
-                              )),
-                        );
+                        NavigationUtils.navigatorPush(context, VehicleListScreen(initialIndex: initialIndex));
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
