@@ -1,3 +1,4 @@
+
 import '../enums/VehicleType.dart';
 
 class VehicleDetailsModel {
@@ -5,6 +6,7 @@ class VehicleDetailsModel {
   String? vehicleNumber;
   String? driverName;
   VehicleType? vehicleType;
+  String? vehicleName;
   int? vehicleRunKM;
   String? vehicleFuelType;
   int? vehicleKMLimit;
@@ -24,6 +26,7 @@ class VehicleDetailsModel {
       required this.vehicleFuelType,
       required this.vehicleKMLimit,
       required this.lat,
+        required this.vehicleName,
       required this.lng,
       required this.updatedTime,
       required this.isActive,
@@ -58,7 +61,8 @@ class VehicleDetailsModel {
         updatedTime: json["updatedTime"],
         isActive: json["isActive"],
         currentLocation: currentLocation,
-        todayKm: json["todayKm"]);
+        todayKm: json["todayKm"],
+        vehicleName: json["vehicleType"]);
   }
 }
 

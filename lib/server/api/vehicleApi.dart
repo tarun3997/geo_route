@@ -6,6 +6,7 @@ import 'package:geo_route/model/VehicleShortDetailModel.dart';
 import 'package:geo_route/screens/HomeScreen.dart';
 import 'package:geo_route/server/url.dart';
 import 'package:geo_route/utils/ErrorHandler.dart';
+import 'package:geo_route/utils/NavigationUtils.dart';
 
 class VehicleApi {
   final Dio dio = Dio();
@@ -19,7 +20,7 @@ class VehicleApi {
       }
     } catch (e) {
       print(e);
-      throw Exception(e);
+      throw Exception("here $e");
     }
   }
 
@@ -77,11 +78,7 @@ class VehicleApi {
         "driverName": driverName
       });
       if (response.statusCode == 201) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-          (route) => false,
-        );
+        NavigationUtils.navigatorPushAndRemoveUntil(context, const HomeScreen());
       } else {
         ErrorHandler.showSnackBar(context, "Getting error in adding vehicle");
       }

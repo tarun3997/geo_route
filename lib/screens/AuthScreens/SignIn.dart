@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:geo_route/server/api/authenticationApi.dart';
+import 'package:geo_route/utils/NavigationUtils.dart';
 
 import 'Signup.dart';
 
@@ -110,17 +111,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           const Text("Don't have account?"),
                           const SizedBox(width: 5,),
                           GestureDetector(onTap: (){
-                            if (Theme.of(context).platform == TargetPlatform.iOS) {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(builder: (context) => const SignupScreen()),
-                              );
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const SignupScreen()),
-                              );
-                            }
+                            NavigationUtils.navigatorPush(context, const SignupScreen());
                           }, child: const Text("Create one",style: TextStyle(color: Colors.blue))),
                         ],
                       ),

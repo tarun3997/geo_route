@@ -3,6 +3,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:geo_route/screens/AuthScreens/SignIn.dart';
 import 'package:geo_route/server/api/authenticationApi.dart';
+import 'package:geo_route/utils/NavigationUtils.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -136,7 +137,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           const Text("Already have a account?"),
                           const SizedBox(width: 5,),
                           GestureDetector(onTap: (){
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => const SignInScreen()));
+                            NavigationUtils.navigatorPush(context, const SignInScreen());
                           }, child: const Text("Log In",style: TextStyle(color: Colors.blue))),
                         ],
                       )
