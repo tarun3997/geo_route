@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CarCard extends StatelessWidget {
-  const CarCard({super.key, required this.image, required this.cardTitle, required this.count});
+  const   CarCard({super.key, required this.image, required this.cardTitle, required this.count});
 
   final String? image;
   final String? cardTitle;
@@ -11,7 +11,6 @@ class CarCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-
       child: SizedBox(
         width: MediaQuery.of(context).size.width /2,
         height: 50,

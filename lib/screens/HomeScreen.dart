@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/enums/NetworkStatus.dart';
 import 'package:geo_route/model/HomeVehicleModel.dart';
+import 'package:geo_route/screens/NotificationScreen.dart';
 import 'package:geo_route/server/api/authenticationApi.dart';
 import 'package:geo_route/server/api/vehicleApi.dart';
 import 'package:geo_route/server/services/NetworkServices.dart';
@@ -109,7 +110,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              if (Theme.of(context).platform == TargetPlatform.iOS) {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                      builder: (context) => const NotificationScreen()),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotificationScreen()),
+                );
+              }
+            },
             icon: const Icon(Icons.notifications, color: Colors.black),
           ),
           GestureDetector(
