@@ -33,14 +33,14 @@ class NotificationCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Vehicle number: $vehicleNumber",
+                        "$vehicleNumber:",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
                       ),
                       Text(
-                        "Info: $alertInfo",
+                        "$alertInfo:",
                         style: const TextStyle(
                           fontSize: 16,
                         ),
