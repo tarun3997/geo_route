@@ -9,6 +9,18 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  String message = "";
+  @override
+  void didChangeDependencies(){
+    final argument = ModalRoute.of(context)!.settings.arguments;
+    if(argument != null){
+      Map? pushArgument = argument as Map;
+
+      setState(() {
+        message = pushArgument["message"];
+      });
+    }
+  }
   Map<String, Map> notifications = {
     'alert1': {
       'vehicleNo': 'RJ27CA6453',
@@ -72,30 +84,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
         itemCount: notifications.length,
         itemBuilder: (context, index) {
           String key = notifications.keys.elementAt(index);
-          return Dismissible(
-            background: Container(
-              color: Colors.red,
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Delete",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 18),),
-                    Text("Delete",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 18),), 
-                  ],
-                ),
-              ),
-            ),
-            key: ValueKey(key),
-            onDismissed: (direction){
-              setState(() {
-                notifications.remove(key);
-              });
-            },
-            child: NotificationCard(
-                vehicleNumber: notifications[key]!['vehicleNo'].toString(),
-                alertInfo: notifications[key]!['info'].toString()
-            ),
+          return NotificationCard(
+              vehicleNumber: notifications[key]!['vehicleNo'].toString(),
+              alertInfo: notifications[key]!['info'].toString()
           );
         },
       ),

@@ -9,6 +9,7 @@ import 'package:geo_route/server/services/NetworkServices.dart';
 import 'package:geo_route/utils/ErrorHandler.dart';
 import 'package:geo_route/utils/NavigationUtils.dart';
 import 'package:geo_route/widget/CarCard.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'AddVehicle.dart';
 import 'VehicleListScreen.dart';
 
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<HomeVehicleModel> homeVehicleModel = [
     HomeVehicleModel(image: 'bike.png', cardTitle: "All vehicles", count: 0),
     HomeVehicleModel(image: 'bike.png', cardTitle: "Two-wheeler", count: 0),
-    HomeVehicleModel(image: 'jeep.png', cardTitle: "Four-wheeler", count: 0),
+    HomeVehicleModel(image: 'car.png', cardTitle: "Four-wheeler", count: 0),
     HomeVehicleModel(image: 'truck.png', cardTitle: "Heavy vehicle", count: 0),
   ];
 
@@ -40,8 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     fetchVehicleCount();
     checkInternet();
+    requestPermission();
   }
 
+  Future<void> requestPermission()async{
+    const permission = Permission.notification;
+    if(await permission.isDenied){
+      await permission.request();
+    }
+  }
   void checkInternet()async{
     NetworkStatus status = await _networkServices.checkConnectivity();
     setState(() {
@@ -111,18 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              if (Theme.of(context).platform == TargetPlatform.iOS) {
-                Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                      builder: (context) => const NotificationScreen()),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const NotificationScreen()),
-                );
-              }
+              NavigationUtils.navigatorPush(context, const NotificationScreen());
+
             },
             icon: const Icon(Icons.notifications, color: Colors.black),
           ),
