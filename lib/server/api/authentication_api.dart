@@ -17,9 +17,9 @@ class Authentication{
         "password": password
       });
       if(response.statusCode == 201){
-      String id = response.data['id'];
-      Helper().setId(id);
-      NavigationUtils.navigatorPushAndRemoveUntil(context, const HomeScreen());
+        String id = response.data['id'];
+        Helper().setId(id);
+        NavigationUtils.navigatorPushAndRemoveUntil(context, const HomeScreen());
       }else{
         ErrorHandler.showSnackBar(context, "Getting error in registration");
       }
