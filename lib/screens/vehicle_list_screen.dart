@@ -1,10 +1,10 @@
 import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geo_route/enums/VehicleType.dart';
-import 'package:geo_route/model/VehicleShortDetailModel.dart';
-import 'package:geo_route/server/api/vehicleApi.dart';
-import 'package:geo_route/widget/VehicleDetailsScreenCard.dart';
+import 'package:geo_route/enums/vehicle_type.dart';
+import 'package:geo_route/model/vehicle_short_detail_model.dart';
+import 'package:geo_route/server/api/vehicle_api.dart';
+import 'package:geo_route/widget/vehicle_details_screen_card.dart';
 
 class VehicleListScreen extends StatefulWidget {
   final int initialIndex;

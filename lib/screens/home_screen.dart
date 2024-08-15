@@ -1,17 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geo_route/enums/NetworkStatus.dart';
-import 'package:geo_route/model/HomeVehicleModel.dart';
-import 'package:geo_route/screens/NotificationScreen.dart';
-import 'package:geo_route/server/api/authenticationApi.dart';
-import 'package:geo_route/server/api/vehicleApi.dart';
-import 'package:geo_route/server/services/NetworkServices.dart';
-import 'package:geo_route/utils/ErrorHandler.dart';
-import 'package:geo_route/utils/NavigationUtils.dart';
-import 'package:geo_route/widget/CarCard.dart';
+import 'package:geo_route/enums/network_status.dart';
+import 'package:geo_route/model/home_vehicle_model.dart';
+import 'package:geo_route/screens/notification_screen.dart';
+import 'package:geo_route/server/api/authentication_api.dart';
+import 'package:geo_route/server/api/vehicle_api.dart';
+import 'package:geo_route/server/services/network_services.dart';
+import 'package:geo_route/utils/error_handler.dart';
+import 'package:geo_route/utils/navigation_utils.dart';
+import 'package:geo_route/widget/car_card.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'AddVehicle.dart';
-import 'VehicleListScreen.dart';
+import 'add_vehicle.dart';
+import 'vehicle_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  NetworkStatus _networkStatus = NetworkStatus.Unknown;
+  NetworkStatus networkStatus = NetworkStatus.unknown;
   final NetworkServices _networkServices = NetworkServices();
 
   final List<HomeVehicleModel> homeVehicleModel = [
@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void checkInternet()async{
     NetworkStatus status = await _networkServices.checkConnectivity();
     setState(() {
-      _networkStatus = status;
+      networkStatus = status;
     });
   }
   Future<void> fetchVehicleCount() async {
@@ -67,10 +67,12 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     } catch (e) {
-      ErrorHandler.showSnackBar(context, "Getting error in vehicle count $e");
+      if(mounted){
       setState(() {
         isLoading = false;
       });
+      ErrorHandler.showSnackBar(context, "Getting error in vehicle count $e");
+      }
     }
   }
 

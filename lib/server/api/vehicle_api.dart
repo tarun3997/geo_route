@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geo_route/model/VehicleDetailsModel.dart';
-import 'package:geo_route/model/VehicleShortDetailModel.dart';
-import 'package:geo_route/screens/HomeScreen.dart';
+import 'package:geo_route/model/vehicle_details_model.dart';
+import 'package:geo_route/model/vehicle_short_detail_model.dart';
+import 'package:geo_route/screens/home_screen.dart';
 import 'package:geo_route/server/url.dart';
-import 'package:geo_route/utils/ErrorHandler.dart';
-import 'package:geo_route/utils/NavigationUtils.dart';
+import 'package:geo_route/utils/error_handler.dart';
+import 'package:geo_route/utils/navigation_utils.dart';
 
 class VehicleApi {
   final Dio dio = Dio();
@@ -77,13 +77,20 @@ class VehicleApi {
         "vehicleKMLimit": setLimit,
         "driverName": driverName
       });
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201){
+        if(context.mounted){
         NavigationUtils.navigatorPushAndRemoveUntil(context, const HomeScreen());
+        }
       } else {
+        if(context.mounted){
         ErrorHandler.showSnackBar(context, "Getting error in adding vehicle");
+        }
       }
     } catch (e) {
+      if(context.mounted){
+        print('Error occurred: ${e.toString()}');
       ErrorHandler.showSnackBar(context, "Getting error $e");
+      }
     }
   }
 }

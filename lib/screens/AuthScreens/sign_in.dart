@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:geo_route/server/api/authenticationApi.dart';
-import 'package:geo_route/utils/NavigationUtils.dart';
+import 'package:geo_route/server/api/authentication_api.dart';
+import 'package:geo_route/utils/navigation_utils.dart';
 
-import 'Signup.dart';
+import 'sign_up.dart';
 
 
 class SignInScreen extends StatefulWidget {

@@ -1,6 +1,6 @@
 
 
-import 'package:geo_route/enums/VehicleType.dart';
+import 'package:geo_route/enums/vehicle_type.dart';
 
 class VehicleShortDetailModel {
   String id;

@@ -15,4 +15,8 @@
     <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
         <item name="android:windowBackground">?android:colorBackground</item>
     </style>
+    <string name="gcm_defaultSenderId" translatable="false">237549893757</string>
+    <string name="google_api_key" translatable="false">AIzaSyC15TszXBw9E_5qfkN-UeaBEkZrKK9QGm0</string>
+    <string name="google_app_id" translatable="false">1:237549893757:android:0becd0ee4f4b1e61fd5914</string>
+    <string name="project_id" translatable="false">geo-route-edf61</string>
 </resources>
