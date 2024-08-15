@@ -12,7 +12,7 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return  Padding(
       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 10),
       child: Card(
         child: Padding(
@@ -26,29 +26,29 @@ class NotificationCard extends StatelessWidget {
                   "https://t3.ftcdn.net/jpg/01/93/90/82/360_F_193908219_ak4aB1PzlhizUVGLOVowzHICc3tl6WeX.jpg",
                 ),
               ),
+              const SizedBox(width: 12,),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                child: Text.rich(
+                  softWrap: true,
+                TextSpan(
+                
+                  text: "$vehicleNumber:",
+                    style:  const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
                     children: [
-                      Text(
-                        "$vehicleNumber:",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      Text(
-                        "$alertInfo:",
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
+                    TextSpan(
+                      text: "$alertInfo:",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                            ),
+                    )
+                  ]
                 ),
-              ),
+                ),
+              )
             ],
           ),
         ),

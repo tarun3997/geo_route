@@ -8,11 +8,6 @@ void showSnackBar(context, color, message){
     ),
     backgroundColor: color,
     duration: const Duration(seconds: 2),
-    action: SnackBarAction(
-      label: "ok",
-      onPressed: (){},
-      textColor: Colors.white,
-    ),
   )
   );
 }

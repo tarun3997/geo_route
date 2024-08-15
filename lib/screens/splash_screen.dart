@@ -1,15 +1,13 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geo_route/screens/AuthScreens/Signup.dart';
-import 'package:geo_route/screens/HomeScreen.dart';
-import 'package:geo_route/utils/Gap.dart';
-import 'package:geo_route/utils/NavigationUtils.dart';
+import 'package:geo_route/screens/AuthScreens/sign_up.dart';
+import 'package:geo_route/screens/home_screen.dart';
+import 'package:geo_route/utils/gap.dart';
+import 'package:geo_route/utils/navigation_utils.dart';
 
-import '../enums/NetworkStatus.dart';
-import '../server/services/NetworkServices.dart';
-import '../utils/Helper.dart';
+import '../enums/network_status.dart';
+import '../server/services/network_services.dart';
+import '../utils/helper.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,7 +18,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   late String id = '';
-  NetworkStatus _networkStatus = NetworkStatus.Unknown;
+  NetworkStatus networkStatus = NetworkStatus.unknown;
   final NetworkServices _networkService = NetworkServices();
   Timer? _timer;
 
@@ -40,9 +38,10 @@ class _SplashScreenState extends State<SplashScreen> {
     NetworkStatus status = await _networkService.checkConnectivity();
     if (!mounted) return;
     setState(() {
-      _networkStatus = status;
+      networkStatus = status;
     });
-    if (status == NetworkStatus.Online) {
+    print(status);
+    if (status == NetworkStatus.online) {
       _checkUserLogin();
     } else {
       _timer = Timer(const Duration(seconds: 3), () {

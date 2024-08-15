@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:geo_route/widget/NotificationCard.dart';
+import 'package:geo_route/widget/notification_card.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -12,6 +12,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   String message = "";
   @override
   void didChangeDependencies(){
+    super.didChangeDependencies();
     final argument = ModalRoute.of(context)!.settings.arguments;
     if(argument != null){
       Map? pushArgument = argument as Map;

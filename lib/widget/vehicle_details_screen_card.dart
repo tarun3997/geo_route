@@ -1,8 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geo_route/enums/VehicleType.dart';
-import 'package:geo_route/screens/VehicleDetailsScreen.dart';
-import 'package:geo_route/utils/NavigationUtils.dart';
+import 'package:geo_route/enums/vehicle_type.dart';
+import 'package:geo_route/screens/vehicle_details_screen.dart';
+import 'package:geo_route/utils/navigation_utils.dart';
 
 class VehicleDetailsCard extends StatefulWidget {
   final String id;

@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geo_route/model/VehicleDetailsModel.dart';
-import 'package:geo_route/server/api/vehicleApi.dart';
+import 'package:geo_route/model/vehicle_details_model.dart';
+import 'package:geo_route/server/api/update_api.dart';
+import 'package:geo_route/server/api/vehicle_api.dart';
 import 'package:geo_route/server/services/mapmyindia_config.dart';
-import 'package:geo_route/utils/Gap.dart';
+import 'package:geo_route/utils/gap.dart';
 import 'package:mapmyindia_gl/mapmyindia_gl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -21,7 +22,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   final VehicleApi vehicleApi = VehicleApi();
   late Future<VehicleDetailsModel> vehicleDetailsFuture;
-
+  final TextEditingController _textFieldController = TextEditingController();
   @override
   void initState() {
     MapmyIndiaAccountManager.setMapSDKKey(mapMyIndiaMapSdkKey);
@@ -69,6 +70,97 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     setState(() {
       vehicleDetailsFuture = vehicleApi.getVehicleDetailsById(id: widget.id);
     });
+  }
+
+  String? userInput;
+
+  Future<void> displayUpdateDialog({required String title,required String id}) async{
+    showDialog(context: context, builder: (BuildContext context) {
+      return Theme.of(context).platform == TargetPlatform.iOS ?
+      CupertinoAlertDialog(
+
+        title: Text(title),
+
+        content: Column(
+          children: [
+            const Gap(10),
+            CupertinoTextField(
+              onChanged: (value) {
+                setState(() {
+                  userInput = value;
+                });
+              },
+              keyboardType: TextInputType.number,
+              controller: _textFieldController,
+              placeholder: "Set new limit",
+              style: const TextStyle(fontSize: 16),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.black, // Underline color
+                    width: 1.0,        // Underline width
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          CupertinoDialogAction(child: const Text('Cancel'), onPressed: (){
+            _textFieldController.clear();
+            userInput = null;
+            Navigator.of(context).pop();
+          },),
+          CupertinoDialogAction(child: const Text('Update'), onPressed: ()async{
+            if(userInput != null && userInput!.isNotEmpty){
+              await updateVehicleKmLimit(context: context, id: id, newLimit: int.parse(userInput!),refresh: _refreshData);
+              _textFieldController.clear();
+              userInput = null;
+            }
+          },)
+
+        ],
+      )
+          : AlertDialog(
+
+        title: Text(title),
+        content: TextField(
+          onChanged: (value) {
+            setState(() {
+              userInput = value;
+            });
+          },
+          controller: _textFieldController,
+          keyboardType: TextInputType.number,
+
+          decoration: const InputDecoration(hintText: "Set new limit"),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              _textFieldController.clear();
+              userInput = null;
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: const Text('Update'),
+            onPressed: () async {
+              if (userInput != null && userInput!.isNotEmpty) {
+                await updateVehicleKmLimit(context: context,
+                    id: id,
+                    newLimit: int.parse(userInput!),
+                    refresh: _refreshData);
+                _textFieldController.clear();
+                userInput = null;
+              }
+            },
+          ),
+        ],
+      );
+    }
+    );
   }
 
   @override
@@ -214,13 +306,13 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               Row(
                                                 children: [
                                                   const Icon(Icons.local_gas_station_outlined, size: 18,),
-                                              Text(":- ${vehicleDetails.vehicleFuelType}" ?? "N/A", style: const TextStyle(fontSize: 12),)
+                                              Text(":- ${vehicleDetails.vehicleFuelType}", style: const TextStyle(fontSize: 12),)
                                                 ],
                                               ),
                                               Row(
                                                 children: [
                                                   const Icon(Icons.sim_card_outlined, size: 18,),
-                                              Text(":- ${vehicleDetails.id}" ?? "N/A", style: const TextStyle(fontSize: 12),)
+                                              Text(":- ${vehicleDetails.id}", style: const TextStyle(fontSize: 12),)
                                                 ],
                                               ),
                                             ],
@@ -291,7 +383,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                     height: 24,
                                                     child: VerticalDivider(),
                                                   ),
-                                                  cardData(title: "Limit Left", value: "50", type: "Km"),
+                                                  cardData(title: "Limit Left", value: "${vehicleDetails.vehicleLimitLeft}", type: "Km"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
@@ -300,12 +392,17 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                 ],
                                               ),
                                             ),
-                                            const Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Text("Edit Limit", style: TextStyle(fontWeight: FontWeight.bold),),
-                                                Icon(Icons.arrow_forward_ios_outlined, size: 12,),
-                                              ],
+                                            GestureDetector(
+                                              onTap: (){
+                                                displayUpdateDialog(title: "Edit vehicle KM limit",id: vehicleDetails.id!);
+                                              },
+                                              child: const Row(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text("Edit Limit", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                  Icon(Icons.arrow_forward_ios_outlined, size: 12,),
+                                                ],
+                                              ),
                                             ),
                                                 const Gap(6)
                                           ],
@@ -346,12 +443,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  cardData(title: "Avg Speed", value: "38", type:"Km/h"),
+                                                  cardData(title: "Avg Speed", value: "${vehicleDetails.averageSpeed}", type:"Km/h"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
                                                   ),
-                                                  cardData(title: "Max Speed", value: "68", type: "Km/h"),
+                                                  cardData(title: "Max Speed", value: "${vehicleDetails.maxSpeed}", type: "Km/h"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),

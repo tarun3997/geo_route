@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:geo_route/screens/HomeScreen.dart';
+import 'package:geo_route/screens/home_screen.dart';
 import 'package:geo_route/server/url.dart';
-import 'package:geo_route/utils/ErrorHandler.dart';
-import 'package:geo_route/utils/Helper.dart';
-import 'package:geo_route/utils/NavigationUtils.dart';
+import 'package:geo_route/utils/error_handler.dart';
+import 'package:geo_route/utils/helper.dart';
+import 'package:geo_route/utils/navigation_utils.dart';
 
-import '../../screens/AuthScreens/SignIn.dart';
+import '../../screens/AuthScreens/sign_in.dart';
 
 class Authentication{
   final Dio dio = Dio();
