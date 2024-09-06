@@ -44,7 +44,7 @@ class ShowDialog {
               },
             ),
             TextButton(
-              child: const Text('Update'),
+              child: const Text('Insert'),
               onPressed: () {
                 Navigator.of(context).pop(textValue);
               },

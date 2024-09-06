@@ -1,4 +1,10 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geo_route/model/notification_model.dart';
+import 'package:geo_route/server/api/notification_api.dart';
+import 'package:geo_route/utils/timestamp.dart';
 import 'package:geo_route/widget/notification_card.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -9,69 +15,19 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
-  String message = "";
-  @override
-  void didChangeDependencies(){
-    super.didChangeDependencies();
-    final argument = ModalRoute.of(context)!.settings.arguments;
-    if(argument != null){
-      Map? pushArgument = argument as Map;
+  Future<List<NotificationModel>>? notificationModel;
 
-      setState(() {
-        message = pushArgument["message"];
-      });
-    }
+  @override
+  void initState() {
+    notificationModel = handelGetNotification();
+    super.initState();
   }
-  Map<String, Map> notifications = {
-    'alert1': {
-      'vehicleNo': 'RJ27CA6453',
-      'info': 'You have crossed 80% limit with 7000KM'
-    },
-    'alert2': {
-      'vehicleNo': 'MH14AB1234',
-      'info': 'You have crossed 90% limit with 15000KM'
-    },
-    'alert3': {
-      'vehicleNo': 'KA01CD5678',
-      'info': 'You have crossed 90% limit with 15000KM'
-    },
-    'alert4': {
-      'vehicleNo': 'TN22EF9012',
-      'info': 'You have crossed 85% limit with 12000KM'
-    },
-    'alert5': {
-      'vehicleNo': 'UP34GH5678',
-      'info': 'You have crossed 95% limit with 18000KM'
-    },
-    'alert6': {
-      'vehicleNo': 'AP45IJ2345',
-      'info': 'You have crossed 80% limit with 10000KM'
-    },
-    'alert7': {
-      'vehicleNo': 'KL56MN3456',
-      'info': 'You have crossed 90% limit with 16000KM'
-    },
-    'alert8': {
-      'vehicleNo': 'WB67OP4567',
-      'info': 'You have crossed 85% limit with 13000KM'
-    },
-    'alert9': {
-      'vehicleNo': 'MP78QR5678',
-      'info': 'You have crossed 95% limit with 19000KM'
-    },
-    'alert10': {
-      'vehicleNo': 'RJ89ST9012',
-      'info': 'You have crossed 80% limit with 11000KM'
-    },
-    'alert11': {
-      'vehicleNo': 'MH90UV2345',
-      'info': 'You have crossed 90% limit with 17000KM'
-    },
-    'alert12': {
-      'vehicleNo': 'KA01WX3456',
-      'info': 'You have crossed 85% limit with 14000KM'
-    },
-  };
+
+  Future<void> _refreshNotifications() async {
+    setState(() {
+      notificationModel = handelGetNotification();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,14 +37,83 @@ class _NotificationScreenState extends State<NotificationScreen> {
         shadowColor: Colors.grey,
         title: const Text('Notifications'),
       ),
-      body: ListView.builder(
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          String key = notifications.keys.elementAt(index);
-          return NotificationCard(
-              vehicleNumber: notifications[key]!['vehicleNo'].toString(),
-              alertInfo: notifications[key]!['info'].toString()
+      body: Theme.of(context).platform == TargetPlatform.iOS
+          ? _buildCupertinoList()
+          : _buildMaterialList(),
+    );
+  }
+
+  Widget _buildCupertinoList() {
+    return FutureBuilder<List<NotificationModel>>(
+      future: notificationModel,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CupertinoActivityIndicator(radius: 20),
           );
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData) {
+          return const Center(child: Text("No data found"));
+        } else {
+          final data = snapshot.data!;
+          return CustomScrollView(
+            slivers: <Widget>[
+              CupertinoSliverRefreshControl(
+                onRefresh: _refreshNotifications,
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                    final notification = data[index];
+                    String formattedTime = formatTimestamp(notification.time);
+                    return NotificationCard(
+                      vehicleNumber: notification.vehicleNumber,
+                      title: notification.title,
+                      body: notification.body,
+                      time: formattedTime,
+                    );
+                  },
+                  childCount: data.length,
+                ),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  Widget _buildMaterialList() {
+    return RefreshIndicator(
+      onRefresh: _refreshNotifications,
+      child: FutureBuilder<List<NotificationModel>>(
+        future: notificationModel,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text("No data found"));
+          } else {
+            final data = snapshot.data!;
+            return ListView.builder(
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                final notification = data[index];
+                String formattedTime = formatTimestamp(notification.time);
+                return NotificationCard(
+                  vehicleNumber: notification.vehicleNumber,
+                  title: notification.title,
+                  body: notification.body,
+                  time: formattedTime,
+                );
+              },
+            );
+          }
         },
       ),
     );

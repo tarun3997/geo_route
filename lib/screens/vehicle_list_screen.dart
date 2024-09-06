@@ -212,7 +212,7 @@ class _VehicleListScreenState extends State<VehicleListScreen>
         child: Text('No ${type.name}s are available', style: textStyle),
       );
     }
-    return RefreshIndicator(
+    return Theme.of(context).platform == TargetPlatform.iOS ? _buildCupertinoList(vehicles) : RefreshIndicator(
       onRefresh: _refreshData,
       child: ListView.builder(
         itemCount: vehicles.length,
@@ -238,6 +238,39 @@ class _VehicleListScreenState extends State<VehicleListScreen>
           );
         },
       ),
+    );
+  }
+
+  Widget _buildCupertinoList(List vehicles){
+    return CustomScrollView(
+      slivers: [
+        CupertinoSliverRefreshControl(
+          onRefresh: _refreshData,
+        ),
+        SliverList(delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            final vehicle = vehicles[index];
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: VehicleDetailsCard(
+                id: vehicle.id,
+                lng: vehicle.lng,
+                lat: vehicle.lat,
+                type: vehicle.type,
+                currentLocation: vehicle.currentLocation,
+                distance: vehicle.distance,
+                remainingKm: vehicle.remainingKm,
+                runTime: vehicle.runTime ?? 0 ,
+                todayKm: vehicle.todayKm ?? 0,
+                vehicleNumber: vehicle.vehicleNumber,
+                updatedTime: vehicle.updatedTime,
+                isActive: vehicle.isActive,
+              ),
+            );
+          },
+          childCount: vehicles.length
+        ))
+      ],
     );
   }
 }

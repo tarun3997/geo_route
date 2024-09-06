@@ -1,4 +1,5 @@
 
+
 import '../enums/vehicle_type.dart';
 
 class VehicleDetailsModel {
@@ -7,7 +8,7 @@ class VehicleDetailsModel {
   String? driverName;
   VehicleType? vehicleType;
   String? vehicleName;
-  int? vehicleRunKM;
+  String? vehicleRunKM;
   String? vehicleFuelType;
   int? vehicleKMLimit;
   int? vehicleLimitLeft;
@@ -16,8 +17,9 @@ class VehicleDetailsModel {
   String? updatedTime;
   bool? isActive;
   String? currentLocation;
-  String? averageSpeed;
-  String? maxSpeed;
+  double averageSpeed;
+  double maxSpeed;
+  double? lastSpeed;
   int? todayKm;
 
   VehicleDetailsModel(
@@ -29,6 +31,7 @@ class VehicleDetailsModel {
       required this.vehicleFuelType,
       required this.vehicleKMLimit,
       required this.lat,
+        required this.lastSpeed,
         required this.vehicleName,
         required this.vehicleLimitLeft,
       required this.lng,
@@ -44,11 +47,13 @@ class VehicleDetailsModel {
     double? lat;
     double? lng;
     String? currentLocation;
+    double? lastSpeed;
 
     if (locationData is Map<String, dynamic>) {
       lat = locationData['latitude']?.toDouble();
       lng = locationData['longitude']?.toDouble();
       currentLocation = locationData['locationName'];
+      lastSpeed = (locationData['lastSpeed'] as num).toDouble();
     } else if (locationData is String) {
       lat = 0.0;
       lng = 0.0;
@@ -59,18 +64,19 @@ class VehicleDetailsModel {
         vehicleNumber: json["vehicleNumber"],
         driverName: json["driverName"],
         vehicleType: VehicleType.fromString(json['vehicleType'] as String),
-        vehicleLimitLeft: json["vehicleLimitLeft"],
-        vehicleRunKM: json["vehicleRunKM"],
+        vehicleLimitLeft: json["vehicleLimitLeft"] as int?,
+        vehicleRunKM: json["vehicleRunKM"] ,
         vehicleFuelType: json["vehicleFuelType"],
-        vehicleKMLimit: json["vehicleKMLimit"],
+        vehicleKMLimit: json["vehicleKMLimit"] as int?,
         lat: lat ?? 0.0,
         lng: lng ?? 0.0,
         updatedTime: json["updatedTime"],
         isActive: json["isActive"],
-        averageSpeed: json["averageSpeed"],
-        maxSpeed: json["maxSpeed"],
+        averageSpeed: (json["averageSpeed"] as num?)?.toDouble() ?? 0.0,
+        maxSpeed: (json["maxSpeed"] as num?)?.toDouble() ?? 0.0,
         currentLocation: currentLocation,
-        todayKm: json["todayKm"],
+        lastSpeed: lastSpeed,
+        todayKm: json["todayKm"] as int?,
         vehicleName: json["vehicleType"]);
   }
 }

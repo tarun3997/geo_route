@@ -19,7 +19,6 @@ class VehicleApi {
         throw Exception('Failed to load vehicle count');
       }
     } catch (e) {
-      print(e);
       throw Exception("here $e");
     }
   }
@@ -37,15 +36,20 @@ class VehicleApi {
         throw Exception('Failed to load vehicle count');
       }
     } catch (e) {
-      print("Exception: $e");
       throw Exception("$e");
     }
   }
   
-  Future<VehicleDetailsModel> getVehicleDetailsById({required String id}) async{
+  Future<VehicleDetailsModel> getVehicleDetailsById({required String id, required String role}) async{
     try{
-      print(id);
-      final response = await dio.get("$url/api/get/vehicle-details-id/$id");
+      final response = await dio.get("$url/api/get/vehicle-details-id",options: Options(
+        headers: {
+          "Authorization": "Bearer your_token_here",
+          "Content-Type": "application/json",
+          "id":id,
+          "role":role
+        }
+      ));
       if(response.statusCode == 200){
         final data = response.data;
         return VehicleDetailsModel.fromJson(data);
@@ -83,13 +87,12 @@ class VehicleApi {
         }
       } else {
         if(context.mounted){
-        ErrorHandler.showSnackBar(context, "Getting error in adding vehicle");
+         ErrorHandler().showError(context,  "Getting error in adding vehicle");
         }
       }
     } catch (e) {
       if(context.mounted){
-        print('Error occurred: ${e.toString()}');
-      ErrorHandler.showSnackBar(context, "Getting error $e");
+      ErrorHandler().showError(context,  "Getting error $e");
       }
     }
   }

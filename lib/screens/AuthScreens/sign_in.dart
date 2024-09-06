@@ -35,13 +35,13 @@ class _SignInScreenState extends State<SignInScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Column(
                     children: [
-                      const Text("Welcome Back",
+                      const Text("Welcome",
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const Text("Sign Up to continue"),
+                      const Text("Login to continue"),
                       const SizedBox(height: 10,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -55,15 +55,14 @@ class _SignInScreenState extends State<SignInScreen> {
                                 name: 'email',
                                 decoration: const InputDecoration(
                                   prefixIcon: Icon(Icons.mail_outline),
-                                  hintText: "email",
-                                  label: Text("Email"),
+                                  hintText: "Email or Vehicle No.",
+                                  label: Text("Enter Email or Number"),
                                   filled: true,
                                   fillColor: Colors.white,
                                   border: InputBorder.none,
                                 ),
                                 validator: FormBuilderValidators.compose([
                                   FormBuilderValidators.required(),
-                                  FormBuilderValidators.email(),
                                 ]),
                               ),
                               const SizedBox(height: 10),
@@ -71,9 +70,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                 name: 'password',
                                 decoration: const InputDecoration(
                                   prefixIcon: Icon(Icons.lock),
-                                  hintText: "password",
+                                  hintText: "Password",
                                   filled: true,
-                                  label: Text("Password"),
+                                  label: Text("Enter Password"),
                                   fillColor: Colors.white,
                                   border: InputBorder.none,
                                 ),
@@ -82,8 +81,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                   FormBuilderValidators.required(),
                                 ]),
                               ),
-                              const SizedBox(height: 10,),
-                              GestureDetector(onTap: (){}, child: const Text("Forgot Password",style: TextStyle(color: Colors.blue),)),
                               const SizedBox(height: 20,),
                               MaterialButton(
                                 elevation: 4,
@@ -104,17 +101,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       const SizedBox(height: 10,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Don't have account?"),
-                          const SizedBox(width: 5,),
-                          GestureDetector(onTap: (){
-                            NavigationUtils.navigatorPush(context, const SignupScreen());
-                          }, child: const Text("Create one",style: TextStyle(color: Colors.blue))),
-                        ],
-                      ),
-                      const SizedBox(height: 5,)
                     ],
                   ),
                 ),

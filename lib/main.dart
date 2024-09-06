@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geo_route/screens/notification_screen.dart';
 import 'package:geo_route/screens/splash_screen.dart';
+import 'package:geo_route/utils/helper.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -45,9 +46,15 @@ void main() async {
       .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
+  String? cachedToken = await Helper().getNotificationToken();
+
+  if(cachedToken == null){
   FirebaseMessaging.instance.getToken().then((value) {
-    print("Token: $value");
+    if(value != null){
+      Helper().setNotificationToken(value);
+    }
   });
+  }
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print("onMessage: ${message.messageId}");

@@ -29,13 +29,14 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     MapmyIndiaAccountManager.setRestAPIKey(mapMyIndiaRestApiKey);
     MapmyIndiaAccountManager.setAtlasClientId(mapMyIndiaAtlasClientId);
     MapmyIndiaAccountManager.setAtlasClientSecret(mapMyIndiaAtlasClientSecret);
-    vehicleDetailsFuture = vehicleApi.getVehicleDetailsById(id: widget.id);
+    vehicleDetailsFuture = vehicleApi.getVehicleDetailsById(id: widget.id, role: 'ADMIN');
     super.initState();
   }
 
   void _onMapCreated(MapmyIndiaMapController controller) async {
     _mapController = controller;
     final vehicleDetails = await vehicleDetailsFuture;
+    _mapController.clearSymbols();
     _addMarker(lat: vehicleDetails.lat, lng: vehicleDetails.lng);
   }
 
@@ -68,8 +69,11 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   Future<void> _refreshData() async {
     setState(() {
-      vehicleDetailsFuture = vehicleApi.getVehicleDetailsById(id: widget.id);
+      vehicleDetailsFuture = vehicleApi.getVehicleDetailsById(id: widget.id,role: 'ADMIN');
     });
+    final vehicleDetails = await vehicleDetailsFuture;
+    _mapController.clearSymbols();
+    _addMarker(lat: vehicleDetails.lat, lng: vehicleDetails.lng);
   }
 
   String? userInput;
@@ -295,7 +299,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
                                               Text(vehicleDetails.vehicleName ?? "N/A", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),),
-                                              Text(vehicleDetails.isActive! ? "Active" : "In-Active", style: const TextStyle(fontSize: 12),),
+                                              Text(vehicleDetails.isActive! ? "Active" : "Active", style: const TextStyle(fontSize: 12),),
                                             ],
                                           ),
                                             ],
@@ -378,12 +382,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  cardData(title: "Total Run", value: "${vehicleDetails.vehicleRunKM}", type:"Km"),
+                                                  cardData(title: "Total Run", value: "5080", type:"Km"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
                                                   ),
-                                                  cardData(title: "Limit Left", value: "${vehicleDetails.vehicleLimitLeft}", type: "Km"),
+                                                  cardData(title: "Limit Left", value: "920", type: "Km"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
@@ -443,7 +447,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  cardData(title: "Avg Speed", value: "${vehicleDetails.averageSpeed}", type:"Km/h"),
+                                                  cardData(title: "Avg Speed", value: "56.76", type:"Km/h"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
@@ -453,7 +457,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                     height: 24,
                                                     child: VerticalDivider(),
                                                   ),
-                                                  cardData(title: "Behavior", value: "Good", type:"😃" )
+                                                  cardData(title: "Last Speed", value: "${vehicleDetails.lastSpeed}", type:"Km/h" )
                                                 ],
                                               ),
                                             ),
@@ -496,12 +500,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  cardData(title: "Refueled on", value: "12/07/2023", type:""),
+                                                  cardData(title: "Refueled on", value: "27/08/2024", type:""),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
                                                   ),
-                                                  cardData(title: "Mileage", value: "8", type: "kmpl"),
+                                                  cardData(title: "Mileage", value: "18", type: "kmpl"),
 
                                                 ],
                                               ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:geo_route/screens/AuthScreens/sign_up.dart';
+import 'package:geo_route/screens/AuthScreens/sign_in.dart';
+import 'package:geo_route/screens/ProfileScreen.dart';
 import 'package:geo_route/screens/home_screen.dart';
 import 'package:geo_route/utils/gap.dart';
 import 'package:geo_route/utils/navigation_utils.dart';
@@ -18,6 +19,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   late String id = '';
+  late String userRole = '';
   NetworkStatus networkStatus = NetworkStatus.unknown;
   final NetworkServices _networkService = NetworkServices();
   Timer? _timer;
@@ -34,13 +36,14 @@ class _SplashScreenState extends State<SplashScreen> {
     super.dispose();
   }
 
+  final Helper helper = Helper();
+
   void _checkNetworkStatus() async {
     NetworkStatus status = await _networkService.checkConnectivity();
     if (!mounted) return;
     setState(() {
       networkStatus = status;
     });
-    print(status);
     if (status == NetworkStatus.online) {
       _checkUserLogin();
     } else {
@@ -53,17 +56,38 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _checkUserLogin() async {
-    String? userId = await Helper().getId();
+    Map<String, String?> user = await helper.getId();
+    String? userId = user['id'];
+    String? role = user['role'];
+    if (userId == null || role == null) {
+      if (mounted) {
+        NavigationUtils.navigatorPushReplacement(context, const SignInScreen());
+      }
+      return;
+          }
     if (!mounted) return;
     setState(() {
-      id = userId ?? '';
+      id = userId;
+      userRole = role;
     });
     _timer = Timer(const Duration(seconds: 3), () {
       if (mounted) {
-        NavigationUtils.navigatorPushReplacement(context, id.isEmpty ? const SignupScreen() : const HomeScreen(),);
+        if(id.isEmpty && userRole.isEmpty){
+        NavigationUtils.navigatorPushReplacement(context, const SignInScreen());
+        }else{
+          if(role == 'USER'){
+            NavigationUtils.navigatorPushReplacement(context, const ProfileScreen());
+          }else if(role == 'ADMIN'){
+            NavigationUtils.navigatorPushReplacement(context, const HomeScreen());
+          }else{
+            NavigationUtils.navigatorPushReplacement(context, const SignInScreen());
+          }
+        }
       }
     });
   }
+
+
 
 
 

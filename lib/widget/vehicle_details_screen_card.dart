@@ -54,7 +54,7 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                     Text("${widget.vehicleNumber}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-                      Text(widget.isActive ? "Not-Active" : "In-Active",style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),),
+                      Text(widget.isActive ?  "Active" : "Not-Active",style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),),
                   ],)
                 ],
               ),

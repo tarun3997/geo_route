@@ -1,5 +1,7 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:geo_route/enums/network_status.dart';
 import 'package:geo_route/model/home_vehicle_model.dart';
 import 'package:geo_route/screens/notification_screen.dart';
@@ -24,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   NetworkStatus networkStatus = NetworkStatus.unknown;
   final NetworkServices _networkServices = NetworkServices();
+
 
   final List<HomeVehicleModel> homeVehicleModel = [
     HomeVehicleModel(image: 'bike.png', cardTitle: "All vehicles", count: 0),
@@ -71,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         isLoading = false;
       });
-      ErrorHandler.showSnackBar(context, "Getting error in vehicle count $e");
+      ErrorHandler().showError(context, "Getting error in vehicle count $e");
       }
     }
   }
@@ -176,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             )
           : _buildRefreshableContent(),
+
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.black,
         onPressed: () {

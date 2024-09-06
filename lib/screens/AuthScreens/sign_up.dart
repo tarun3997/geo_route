@@ -33,13 +33,12 @@ class _SignupScreenState extends State<SignupScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Column(
                     children: [
-                      const Text("Create your account",
+                      const Text("Create Driver account",
                         style: TextStyle(
-                          fontSize: 32,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Text("Sign In to continue"),
                       const SizedBox(height: 10,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -51,8 +50,8 @@ class _SignupScreenState extends State<SignupScreen> {
                                 name: 'username',
                                 decoration: const InputDecoration(
                                   prefixIcon: Icon(Icons.person),
-                                  hintText: "username",
-                                  label: Text("Username"),
+                                  hintText: "Diver Name",
+                                  label: Text("Driver Name"),
                                   filled: true,
                                   fillColor: Colors.white,
                                   border: InputBorder.none,
@@ -78,37 +77,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ]),
                               ),
                               const SizedBox(height: 10),
-                              FormBuilderTextField(
-                                name: 'password',
-                                decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.lock),
-                                  hintText: "password",
-                                  label: Text("Password"),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: InputBorder.none,
-                                ),
-                                obscureText: true,
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(),
-                                ]),
-                              ),
-                              const SizedBox(height: 10),
-                              FormBuilderTextField(
-                                name: 'conform password',
-                                decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.lock),
-                                  hintText: "conform password",
-                                  label: Text("Conform Password"),
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: InputBorder.none,
-                                ),
-                                obscureText: true,
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(),
-                                ]),
-                              ),
+
                               const SizedBox(height: 20,),
                               MaterialButton(
                                 color: Colors.black,
@@ -124,23 +93,14 @@ class _SignupScreenState extends State<SignupScreen> {
 
                                   }
                                 },
-                                child: const Text('Sign Up',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold,fontSize: 16)),
+                                child: const Text('Create Account',style:TextStyle(color:Colors.white,fontWeight:FontWeight.bold,fontSize: 16)),
                               )
                             ],
                           ),
                         ),
                       ),
                       const SizedBox(height: 10,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Already have a account?"),
-                          const SizedBox(width: 5,),
-                          GestureDetector(onTap: (){
-                            NavigationUtils.navigatorPush(context, const SignInScreen());
-                          }, child: const Text("Log In",style: TextStyle(color: Colors.blue))),
-                        ],
-                      )
+
                     ],
                   ),
                 ),

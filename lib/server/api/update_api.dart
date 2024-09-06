@@ -21,9 +21,8 @@ Future<void> updateVehicleKmLimit({required BuildContext context ,required Strin
       }
     }
   }catch(e){
-    print(e);
     if(context.mounted){
-      ErrorHandler.showSnackBar(context, "Getting error while updating Km");
+      ErrorHandler().showError(context,  "Getting error while updating Km");
     }
   }
 }
