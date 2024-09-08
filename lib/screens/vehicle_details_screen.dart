@@ -23,6 +23,53 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   final VehicleApi vehicleApi = VehicleApi();
   late Future<VehicleDetailsModel> vehicleDetailsFuture;
   final TextEditingController _textFieldController = TextEditingController();
+  final Map<String, dynamic> data = {
+    "demo1": {
+      "location": "Udaipur"
+    },
+    "demo2": {
+      "location": "Jaipur"
+    },
+    "demo3": {
+      "location": "Delhi"
+    },
+    "demo4": {
+      "location": "Mumbai"
+    },
+    "demo5": {
+      "location": "Kolkata"
+    },
+    "demo6": {
+      "location": "Chennai"
+    },
+    "demo7": {
+      "location": "Bangalore"
+    },
+    "demo8": {
+      "location": "Hyderabad"
+    },
+    "demo9": {
+      "location": "Ahmedabad"
+    },
+    "demo10": {
+      "location": "Pune"
+    },
+    "demo11": {
+      "location": "Surat"
+    },
+    "demo12": {
+      "location": "Lucknow"
+    },
+    "demo13": {
+      "location": "Chandigarh"
+    },
+    "demo14": {
+      "location": "Bhopal"
+    },
+  };
+  final List limitColor = [const AlwaysStoppedAnimation<Color>(Colors.green),const AlwaysStoppedAnimation<Color>(Colors.yellow),const AlwaysStoppedAnimation<Color>(Colors.red),];
+  int colorIndex = 0;
+
   @override
   void initState() {
     MapmyIndiaAccountManager.setMapSDKKey(mapMyIndiaMapSdkKey);
@@ -169,6 +216,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    colorIndex = ((5080/ 6000) * 2).round();
     return Scaffold(
       appBar: AppBar(
         title: const Text("MAP"),
@@ -338,6 +386,16 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             ),
                                           ),
                                         ],
+                                      ),
+                                      const Gap(12),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                                        child: LinearProgressIndicator(
+                                          value: 5080/6000, // total run/limit
+                                          // same chiz mene scaffold start hota uske just uper bhi ki h color change
+                                          //karne ke lia
+                                          valueColor: limitColor[colorIndex],
+                                        ),
                                       ),
                                       // vehicleDetailCard(
                                       //     context: context,
@@ -514,7 +572,52 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                           ],
                                         ),
                                       ),
-
+                                      const Gap(10),
+                                      ElevatedButton(
+                                          onPressed: (){
+                                            showModalBottomSheet<void>(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return Container(
+                                                    height: MediaQuery.of(context).size.height/2,
+                                                    width: MediaQuery.of(context).size.width,
+                                                    child: Column(
+                                                      children: [
+                                                        const Gap(10),
+                                                        const Text("Past Locations", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                                                        Expanded(
+                                                          child: ListView.builder(
+                                                            scrollDirection: Axis.vertical,
+                                                            itemCount: data.length,
+                                                            itemBuilder: (BuildContext context, int index) {
+                                                              String key = data.keys.elementAt(index);
+                                                              return Padding(
+                                                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                                child: Card(
+                                                                  elevation: 3,
+                                                                  shadowColor: Colors.grey,
+                                                                  child: ListTile(
+                                                                    selectedTileColor: Colors.orange[100],
+                                                                    title: Text(key,style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                                                    trailing: Text("${data[key]['location']}" ,style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
+                                                        ElevatedButton(onPressed: () => Navigator.pop(context), child: Text("Close"))
+                                                      ],
+                                                    ),
+                                                  );
+                                                }
+                                            );
+                                          },
+                                          child: Text("View Past Locations",style: TextStyle(color: Colors.white70),),
+                                        style: ButtonStyle(
+                                          backgroundColor: WidgetStatePropertyAll<Color>(Color(0xff363333)),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
