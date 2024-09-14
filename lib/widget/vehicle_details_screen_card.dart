@@ -16,7 +16,8 @@ class VehicleDetailsCard extends StatefulWidget {
   final double lat;
   final double lng;
   final bool isActive;
-  const VehicleDetailsCard({super.key, this.updatedTime, this.type ,this.vehicleNumber, this.distance, this.runTime, this.remainingKm, this.currentLocation, this.todayKm, required this.lat, required this.lng, required this.isActive, required this.id});
+  final bool repairing;
+  const VehicleDetailsCard({super.key, this.updatedTime, this.type ,this.vehicleNumber, this.distance, this.runTime, this.remainingKm, this.currentLocation, this.todayKm, required this.lat, required this.lng, required this.isActive, required this.id, required this.repairing});
 
   @override
   State<VehicleDetailsCard> createState() => _VehicleDetailsCardState();
@@ -27,7 +28,7 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-          NavigationUtils.navigatorPush(context, VehicleDetailsScreen(id: widget.id));
+        NavigationUtils.navigatorPush(context, VehicleDetailsScreen(id: widget.id, isRepairing: widget.repairing,));
       },
       child: Container(
         decoration: const BoxDecoration(
@@ -45,17 +46,33 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
             Padding(
               padding: const EdgeInsets.all(6.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const SizedBox(width: 11,),
-                  Image.asset("assets/${widget.type.toString().split('.').last}.png",width: 60,),
-                  const SizedBox(width: 10,),
-                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Row(
                     children: [
-                    Text("${widget.vehicleNumber}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-                      Text(widget.isActive ?  "Active" : "Not-Active",style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),),
-                  ],)
+                      const SizedBox(width: 11,),
+                      Image.asset("assets/${widget.type.toString().split('.').last}.png",width: 60,),
+                      const SizedBox(width: 10,),
+                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                        Text("${widget.vehicleNumber}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+                          Text(widget.isActive ?  "Active" : "Not-Active",style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),),
+                      ],)
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 28),
+                    child: Column(
+                      children: [
+                        const Text("Condition",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+                        widget.repairing
+                            ? const Text("Repairing",style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),)
+                            : const Text("Good",style: TextStyle(color: Colors.green, fontSize: 16, fontWeight: FontWeight.bold),)
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

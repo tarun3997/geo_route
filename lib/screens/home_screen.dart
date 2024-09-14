@@ -32,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeVehicleModel(image: 'bike.png', cardTitle: "Two-wheeler", count: 0),
     HomeVehicleModel(image: 'car.png', cardTitle: "Four-wheeler", count: 0),
     HomeVehicleModel(image: 'truck.png', cardTitle: "Heavy vehicle", count: 0),
+    HomeVehicleModel(image: 'car.png', cardTitle: "Repair vehicle", count: 0),
+    HomeVehicleModel(image: 'car.png', cardTitle: "table", count: 0),
   ];
 
   final VehicleApi vehicleApi = VehicleApi();
@@ -66,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
         homeVehicleModel[1].count = data['twoWheeler'] ?? 0;
         homeVehicleModel[2].count = data['fourWheeler'] ?? 0;
         homeVehicleModel[3].count = data['heavyVehicle'] ?? 0;
+        // homeVehicleModel[4].count = data['repairingVehicle'] ?? 0;
         isLoading = false;
       });
     } catch (e) {
@@ -241,6 +244,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 case 3:
                                   initialIndex = 2;
                                   break;
+                                case 4:
+                                  initialIndex = 3;
+                                  break;
                                 default:
                                   initialIndex = 0;
                                   break;
@@ -306,6 +312,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         break;
                       case 3:
                         initialIndex = 2;
+                        break;
+                      case 4:
+                        initialIndex = 3;
                         break;
                       default:
                         initialIndex = 0;
