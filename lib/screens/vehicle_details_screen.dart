@@ -242,6 +242,8 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             return const Center(child: Text("No data found"));
           } else {
             final vehicleDetails = snapshot.data!;
+            final totalRun = double.parse(vehicleDetails.vehicleNewKm);
+            final limit = vehicleDetails.vehicleKMLimit;
             return Stack(
               children: [
                 SizedBox(
@@ -390,21 +392,24 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                       const Gap(12),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(horizontal: 8),
-                                        child: LinearProgressIndicator(
-                                          value: 5080/6000, // total run/limit
-                                          // same chiz mene scaffold start hota uske just uper bhi ki h color change
-                                          //karne ke lia
-                                          valueColor: limitColor[colorIndex],
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text("${vehicleDetails.vehicleNewKm} Km"),
+                                                Text("${vehicleDetails.vehicleKMLimit} Km"),
+                                              ],
+                                            ),
+                                            LinearProgressIndicator(
+                                              value: totalRun / limit, // total run/limit
+
+                                              valueColor: limitColor[colorIndex],
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      // vehicleDetailCard(
-                                      //     context: context,
-                                      //     title: "Vehicle Info",
-                                      //   valueTitle: "Total run",
-                                      //   value: "${vehicleDetails.vehicleRunKM}",
-                                      //   type: "Km",
-                                      //
-                                      // ),
+
                                       const Gap(12),
                                       Card(
                                         shape: const RoundedRectangleBorder(
@@ -440,12 +445,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  cardData(title: "Total Run", value: "5080", type:"Km"),
+                                                  cardData(title: "Total Run", value: "${vehicleDetails.vehicleRunKM}", type:"Km"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
                                                   ),
-                                                  cardData(title: "Limit Left", value: "920", type: "Km"),
+                                                  cardData(title: "Limit Left", value: "${vehicleDetails.vehicleLimitLeft}", type: "Km"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
@@ -505,7 +510,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                               child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                 children: [
-                                                  cardData(title: "Avg Speed", value: "56.76", type:"Km/h"),
+                                                  cardData(title: "Avg Speed", value: vehicleDetails.averageSpeed.toStringAsFixed(2), type:"Km/h"),
                                                   const SizedBox(
                                                     height: 24,
                                                     child: VerticalDivider(),
@@ -548,6 +553,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.w500,
+
                                                     fontSize: 18,
                                                   ),
                                                 ),
@@ -578,13 +584,24 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                             showModalBottomSheet<void>(
                                                 context: context,
                                                 builder: (BuildContext context) {
-                                                  return Container(
+                                                  return SizedBox(
                                                     height: MediaQuery.of(context).size.height/2,
                                                     width: MediaQuery.of(context).size.width,
                                                     child: Column(
                                                       children: [
                                                         const Gap(10),
-                                                        const Text("Past Locations", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                                                        Padding(
+                                                          padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 10),
+                                                          child: Row(
+                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                            children: [
+                                                              const Text("Past Locations", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                                                              GestureDetector(onTap: (){
+                                                                Navigator.pop(context);
+                                                              }, child: const Icon(Icons.close, color: Colors.black,))
+                                                            ],
+                                                          ),
+                                                        ),
                                                         Expanded(
                                                           child: ListView.builder(
                                                             scrollDirection: Axis.vertical,
@@ -606,17 +623,17 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                             },
                                                           ),
                                                         ),
-                                                        ElevatedButton(onPressed: () => Navigator.pop(context), child: Text("Close"))
+                                                        // ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text("Close"))
                                                       ],
                                                     ),
                                                   );
                                                 }
                                             );
                                           },
-                                          child: Text("View Past Locations",style: TextStyle(color: Colors.white70),),
-                                        style: ButtonStyle(
+                                        style: const ButtonStyle(
                                           backgroundColor: WidgetStatePropertyAll<Color>(Color(0xff363333)),
                                         ),
+                                          child: const Text("View Past Locations",style: TextStyle(color: Colors.white70),),
                                       ),
                                     ],
                                   ),

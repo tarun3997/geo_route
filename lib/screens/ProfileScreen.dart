@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_route/model/vehicle_details_model.dart';
 import 'package:geo_route/screens/notification_screen.dart';
 import 'package:geo_route/server/api/authentication_api.dart';
+import 'package:geo_route/server/api/driver_api.dart';
 import 'package:geo_route/server/api/vehicle_api.dart';
 import 'package:geo_route/utils/gap.dart';
 import 'package:geo_route/utils/helper.dart';
@@ -21,6 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final TextStyle subStyle = const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white70);
   final TextEditingController _textFieldController = TextEditingController();
+  final TextEditingController _odometerReadingTextFieldController = TextEditingController();
 
   final VehicleApi driverApi = VehicleApi();
   Future<VehicleDetailsModel>? driverDetail;
@@ -41,92 +43,171 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
   String? userInput;
+  String? odometerReading;
 
-
-  Future<void> displayUpdateDialog({required String title, required String placeholder}) async{
-    showDialog(context: context, builder: (BuildContext context) {
-      return Theme.of(context).platform == TargetPlatform.iOS ?
-      CupertinoAlertDialog(
-
-        title: Text(title),
-
-        content: Column(
-          children: [
-            const Gap(10),
-            CupertinoTextField(
-              onChanged: (value) {
-                setState(() {
-                  userInput = value;
-                });
-              },
-              keyboardType: TextInputType.number,
-              controller: _textFieldController,
-              placeholder: placeholder,
-              style: const TextStyle(fontSize: 16),
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.black, // Underline color
-                    width: 1.0,        // Underline width
+  Future<void> displayUpdateDialog({required String title, required String placeholder}) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Theme.of(context).platform == TargetPlatform.iOS
+            ? CupertinoAlertDialog(
+          title: Text(title),
+          content: Column(
+            children: [
+              const Gap(10),
+              CupertinoTextField(
+                onChanged: (value) {
+                  setState(() {
+                    userInput = value;
+                  });
+                },
+                keyboardType: TextInputType.number,
+                controller: _textFieldController,
+                placeholder: placeholder,
+                style: const TextStyle(fontSize: 16),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.black,
+                      width: 1.0,
+                    ),
                   ),
                 ),
               ),
+              const Gap(10),
+              CupertinoTextField(
+                onChanged: (value) {
+                  setState(() {
+                    odometerReading = value;
+                  });
+                },
+                keyboardType: TextInputType.number,
+                controller: _odometerReadingTextFieldController,
+                placeholder: "Enter Odometer Reading",
+                style: const TextStyle(fontSize: 16),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.black,
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('Cancel'),
+              onPressed: () {
+                _textFieldController.clear();
+                _odometerReadingTextFieldController.clear();
+                userInput = null;
+                odometerReading = null;
+                Navigator.of(context).pop();
+              },
+            ),
+            CupertinoDialogAction(
+              child: const Text('Insert'),
+              onPressed: () async {
+                if (userInput != null &&
+                    userInput!.isNotEmpty &&
+                    odometerReading != null &&
+                    odometerReading!.isNotEmpty) {
+                  // Convert user inputs to double
+                  double fuelAmount = double.tryParse(userInput!) ?? 0;
+                  double odometer = double.tryParse(odometerReading!) ?? 0;
+
+                  // Call API if the values are valid
+                  if (fuelAmount > 0 && odometer > 0) {
+                    await DriverApi().recordFuelRefill(
+                      fuelAmount: fuelAmount,
+                      odometerReading: odometer,
+                      context: context,
+                    );
+
+                    // Clear inputs and close dialog
+                    _textFieldController.clear();
+                    _odometerReadingTextFieldController.clear();
+                    userInput = null;
+                    odometerReading = null;
+                  }
+                }
+              },
             ),
           ],
-        ),
-        actions: [
-          CupertinoDialogAction(child: const Text('Cancel'), onPressed: (){
-            _textFieldController.clear();
-            userInput = null;
-            Navigator.of(context).pop();
-          },),
-          CupertinoDialogAction(child: const Text('Insert'), onPressed: ()async{
-            if(userInput != null && userInput!.isNotEmpty){
-              _textFieldController.clear();
-              userInput = null;
-            }
-          },)
-
-        ],
-      )
-          : AlertDialog(
-
-        title: Text(title),
-        content: TextField(
-          onChanged: (value) {
-            setState(() {
-              userInput = value;
-            });
-          },
-          controller: _textFieldController,
-          keyboardType: TextInputType.number,
-
-          decoration:  InputDecoration(hintText: placeholder),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              _textFieldController.clear();
-              userInput = null;
-              Navigator.of(context).pop();
-            },
+        )
+            : AlertDialog(
+          title: Text(title),
+          content: Column(
+            children: [
+              TextField(
+                onChanged: (value) {
+                  setState(() {
+                    userInput = value;
+                  });
+                },
+                controller: _textFieldController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(hintText: placeholder),
+              ),
+              TextField(
+                onChanged: (value) {
+                  setState(() {
+                    odometerReading = value;
+                  });
+                },
+                controller: _odometerReadingTextFieldController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(hintText: "Enter Odometer Reading"),
+              ),
+            ],
           ),
-          TextButton(
-            child: const Text('Insert'),
-            onPressed: () async {
-              if (userInput != null && userInput!.isNotEmpty) {
-
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
                 _textFieldController.clear();
+                _odometerReadingTextFieldController.clear();
                 userInput = null;
-              }
-            },
-          ),
-        ],
-      );
-    }
+                odometerReading = null;
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Insert'),
+              onPressed: () async {
+                if (userInput != null &&
+                    userInput!.isNotEmpty &&
+                    odometerReading != null &&
+                    odometerReading!.isNotEmpty) {
+                  // Convert user inputs to double
+                  double fuelAmount = double.tryParse(userInput!) ?? 0;
+                  double odometer = double.tryParse(odometerReading!) ?? 0;
+
+                  // Call API if the values are valid
+                  if (fuelAmount > 0 && odometer > 0) {
+                    await DriverApi().recordFuelRefill(
+                      fuelAmount: fuelAmount,
+                      odometerReading: odometer,
+                      context: context,
+                    );
+
+                    // Clear inputs and close dialog
+                    _textFieldController.clear();
+                    _odometerReadingTextFieldController.clear();
+                    userInput = null;
+                    odometerReading = null;
+                  }
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
+
 
   void _showCupertinoMenu() {
     showCupertinoModalPopup(
@@ -275,7 +356,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 Column(
                                   children: [
-                                    Text("${data.averageSpeed}km/h",style: mainStyle,),
+                                    Text("${data.averageSpeed.toStringAsFixed(2)} km/h", style: mainStyle),
                                     Text("Avg. Speed",style: subStyle,),
                                   ],
                                 ),
