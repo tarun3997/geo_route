@@ -664,9 +664,21 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                               children: [
                                                                 Column(
                                                                   children: [
-                                                                    const Padding(
+                                                                    Padding(
                                                                       padding: EdgeInsets.all(20),
-                                                                      child: Text("Submit for Repair", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+                                                                      child: Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Text("Submit for Repair", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+                                                                          IconButton(
+                                                                            onPressed: (){
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            color: Color(0xff363333),
+                                                                            icon: Icon(Icons.close),
+                                                                          ),
+                                                                        ],
+                                                                      ),
                                                                     ),
                                                                     FormBuilder(
                                                                       key: _repairFormKey,
@@ -708,7 +720,6 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                                             FormBuilderTextField(
                                                                                 name: 'email',
                                                                                 decoration: const InputDecoration(
-                                                                                prefixIcon: Icon(Icons.edit),
                                                                                 hintText: "Enter detail for repair",
                                                                                 label: Text("Enter detail for repair"),
                                                                                 filled: true,
@@ -720,49 +731,29 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                                                               ]),
                                                                             ),
                                                                             const SizedBox(height: 20),
-                                                                            Row(
-                                                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                                              children: [
-                                                                                ElevatedButton(
-                                                                                  onPressed: () {
-                                                                                    // Validate the form
-                                                                                    if (_repairFormKey.currentState?.saveAndValidate() ?? false) {
-                                                                                      // If the form is valid, get the form data
-                                                                                      final formData = _repairFormKey.currentState?.value;
-                                                                                      print("Form is valid! Data: $formData");
+                                                                            ElevatedButton(
+                                                                              onPressed: () {
+                                                                                // Validate the form
+                                                                                if (_repairFormKey.currentState?.saveAndValidate() ?? false) {
+                                                                                  // If the form is valid, get the form data
+                                                                                  final formData = _repairFormKey.currentState?.value;
+                                                                                  print("Form is valid! Data: $formData");
 
-                                                                                      // Do something with the data, like send to server
-                                                                                    } else {
-                                                                                      print("Form is invalid!");
-                                                                                    }
-                                                                                  },
-                                                                                  style: ElevatedButton.styleFrom(
-                                                                                    backgroundColor: const Color(0xff363333), // Button color
-                                                                                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),  // Padding inside the button
-                                                                                    elevation: 6, // Shadow effect
-                                                                                    shadowColor: Colors.grey,
-                                                                                  ),
-                                                                                  child: const Text(
-                                                                                    "Submit",
-                                                                                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                                                                                  ),
-                                                                                ),
-                                                                                ElevatedButton(
-                                                                                    onPressed: (){
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    style: ElevatedButton.styleFrom(
-                                                                                      backgroundColor: const Color(0xff363333), // Button color
-                                                                                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),  // Padding inside the button
-                                                                                      elevation: 6, // Shadow effect
-                                                                                      shadowColor: Colors.grey,
-                                                                                    ),
-                                                                                    child: const Text(
-                                                                                        "Close",
-                                                                                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                                                                                    ),
-                                                                                ),
-                                                                              ],
+                                                                                  // Do something with the data, like send to server
+                                                                                } else {
+                                                                                  print("Form is invalid!");
+                                                                                }
+                                                                              },
+                                                                              style: ElevatedButton.styleFrom(
+                                                                                backgroundColor: const Color(0xff363333), // Button color
+                                                                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),  // Padding inside the button
+                                                                                elevation: 6, // Shadow effect
+                                                                                shadowColor: Colors.grey,
+                                                                              ),
+                                                                              child: const Text(
+                                                                                "Submit",
+                                                                                style: TextStyle(color: Colors.white70, fontSize: 16),
+                                                                              ),
                                                                             ),
                                                                           ],
                                                                         ),

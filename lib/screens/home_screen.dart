@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geo_route/enums/network_status.dart';
 import 'package:geo_route/model/home_vehicle_model.dart';
 import 'package:geo_route/screens/notification_screen.dart';
+import 'package:geo_route/screens/table_screen.dart';
 import 'package:geo_route/server/api/authentication_api.dart';
 import 'package:geo_route/server/api/vehicle_api.dart';
 import 'package:geo_route/server/services/network_services.dart';
@@ -230,28 +231,31 @@ class _HomeScreenState extends State<HomeScreen> {
                               homeVehicleModel[index];
                           return GestureDetector(
                             onTap: () {
-                              int initialIndex;
+                              Widget page;
                               switch (index) {
                                 case 0:
-                                  initialIndex = 0;
+                                  page = const VehicleListScreen(initialIndex: 0);
                                   break;
                                 case 1:
-                                  initialIndex = 1;
+                                  page = const VehicleListScreen(initialIndex: 1);
                                   break;
                                 case 2:
-                                  initialIndex = 0;
+                                  page = const VehicleListScreen(initialIndex: 0);
                                   break;
                                 case 3:
-                                  initialIndex = 2;
+                                  page = const VehicleListScreen(initialIndex: 2);
                                   break;
                                 case 4:
-                                  initialIndex = 3;
+                                  page = const VehicleListScreen(initialIndex: 3);
+                                  break;
+                                case 5:
+                                  page = const TableScreen();
                                   break;
                                 default:
-                                  initialIndex = 0;
+                                  page = const VehicleListScreen(initialIndex: 0);
                                   break;
                               }
-                              NavigationUtils.navigatorPush(context, VehicleListScreen(initialIndex: initialIndex));
+                              NavigationUtils.navigatorPush(context, page);
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(2.0),
@@ -299,30 +303,33 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: homeVehicleModel.length,
                   itemBuilder: (context, index) {
                     HomeVehicleModel vehicleModel = homeVehicleModel[index];
-                    int initialIndex;
+                    Widget page;
                     switch (index) {
                       case 0:
-                        initialIndex = 0;
+                        page = const VehicleListScreen(initialIndex: 0);
                         break;
                       case 1:
-                        initialIndex = 1;
+                        page = const VehicleListScreen(initialIndex: 1);
                         break;
                       case 2:
-                        initialIndex = 0;
+                        page = const VehicleListScreen(initialIndex: 0);
                         break;
                       case 3:
-                        initialIndex = 2;
+                        page = const VehicleListScreen(initialIndex: 2);
                         break;
                       case 4:
-                        initialIndex = 3;
+                        page = const VehicleListScreen(initialIndex: 3);
+                        break;
+                      case 5:
+                        page = const TableScreen();
                         break;
                       default:
-                        initialIndex = 0;
+                        page = const VehicleListScreen(initialIndex: 0);
                         break;
                     }
                     return GestureDetector(
                       onTap: () {
-                        NavigationUtils.navigatorPush(context, VehicleListScreen(initialIndex: initialIndex));
+                        NavigationUtils.navigatorPush(context, page);
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(2.0),
