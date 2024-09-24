@@ -25,7 +25,7 @@ class _VehicleListScreenState extends State<VehicleListScreen>
 
   @override
   void initState() {
-    tabController = TabController(length: 3, vsync: this, initialIndex: widget.initialIndex);
+    tabController = TabController(length: 4, vsync: this, initialIndex: widget.initialIndex);
     vehicleShortDetailModel = vehicleApi.handleVehicleList();
 
     super.initState();
@@ -114,7 +114,7 @@ class _VehicleListScreenState extends State<VehicleListScreen>
             children: [
               TabBar(
                 indicatorSize: TabBarIndicatorSize.tab,
-                indicatorWeight: 3,
+                indicatorWeight: 4,
                 indicatorColor: Colors.black,
                 indicator: const UnderlineTabIndicator(
                     borderRadius: BorderRadius.only(
@@ -140,6 +140,12 @@ class _VehicleListScreenState extends State<VehicleListScreen>
                         "Truck",
                         style: textStyle,
                       )),
+                  Tab(
+                    child: Text(
+                      "Repair",
+                      style: textStyle,
+                    ),
+                  )
                 ],
               ),
               FutureBuilder<List<VehicleShortDetailModel>>(
@@ -186,11 +192,13 @@ class _VehicleListScreenState extends State<VehicleListScreen>
                         controller: tabController,
                         children: [
                           _buildVehicleList(
-                              data, VehicleType.car, textStyle),
+                              data, VehicleType.car, textStyle, false),
                           _buildVehicleList(
-                              data, VehicleType.bike, textStyle),
+                              data, VehicleType.bike, textStyle, false),
                           _buildVehicleList(
-                              data, VehicleType.truck, textStyle),
+                              data, VehicleType.truck, textStyle, false),
+                          _buildVehicleList(
+                              data, VehicleType.bike, textStyle, true),
                         ],
                       ),
                     );
@@ -205,14 +213,21 @@ class _VehicleListScreenState extends State<VehicleListScreen>
   }
 
   Widget _buildVehicleList(List<VehicleShortDetailModel> data,
-      VehicleType type, TextStyle textStyle) {
-    final vehicles = data.where((vehicle) => vehicle.type == type).toList();
+      VehicleType type, TextStyle textStyle, bool isRepairing) {
+
+    late List<VehicleShortDetailModel> vehicles;
+
+    // isRepairing
+        // ? vehicles = data.where((vehicle) => vehicle.isRepairing == true).toList()
+        // :
+    vehicles = data.where((vehicle) => vehicle.type == type).toList();
+
     if (vehicles.isEmpty) {
       return Center(
-        child: Text('No ${type.name}s are available', style: textStyle),
+        child: Text('No ${isRepairing? 'repairing' : type.name} are available', style: textStyle),
       );
     }
-    return Theme.of(context).platform == TargetPlatform.iOS ? _buildCupertinoList(vehicles) : RefreshIndicator(
+    return Theme.of(context).platform == TargetPlatform.iOS ? _buildCupertinoList(vehicles, isRepairing) : RefreshIndicator(
       onRefresh: _refreshData,
       child: ListView.builder(
         itemCount: vehicles.length,
@@ -234,6 +249,7 @@ class _VehicleListScreenState extends State<VehicleListScreen>
               vehicleNumber: vehicle.vehicleNumber,
               updatedTime: vehicle.updatedTime,
               isActive: vehicle.isActive,
+              repairing: isRepairing,
             ),
           );
         },
@@ -241,7 +257,7 @@ class _VehicleListScreenState extends State<VehicleListScreen>
     );
   }
 
-  Widget _buildCupertinoList(List vehicles){
+  Widget _buildCupertinoList(List vehicles, bool isRepairing){
     return CustomScrollView(
       slivers: [
         CupertinoSliverRefreshControl(
@@ -265,6 +281,7 @@ class _VehicleListScreenState extends State<VehicleListScreen>
                 vehicleNumber: vehicle.vehicleNumber,
                 updatedTime: vehicle.updatedTime,
                 isActive: vehicle.isActive,
+                repairing: isRepairing,
               ),
             );
           },

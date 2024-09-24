@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:geo_route/model/vehicle_details_model.dart';
 import 'package:geo_route/server/api/update_api.dart';
 import 'package:geo_route/server/api/vehicle_api.dart';
@@ -11,7 +13,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class VehicleDetailsScreen extends StatefulWidget {
   final String id;
-  const VehicleDetailsScreen({super.key, required this.id});
+  final bool isRepairing;
+  const VehicleDetailsScreen({super.key, required this.id, required this.isRepairing});
 
   @override
   State<VehicleDetailsScreen> createState() => _VehicleDetailsScreenState();
@@ -69,6 +72,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   };
   final List limitColor = [const AlwaysStoppedAnimation<Color>(Colors.green),const AlwaysStoppedAnimation<Color>(Colors.yellow),const AlwaysStoppedAnimation<Color>(Colors.red),];
   int colorIndex = 0;
+  final _repairFormKey = GlobalKey<FormBuilderState>();
 
   @override
   void initState() {
@@ -578,63 +582,210 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                           ],
                                         ),
                                       ),
-                                      const Gap(10),
-                                      ElevatedButton(
-                                          onPressed: (){
-                                            showModalBottomSheet<void>(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return SizedBox(
-                                                    height: MediaQuery.of(context).size.height/2,
-                                                    width: MediaQuery.of(context).size.width,
-                                                    child: Column(
-                                                      children: [
-                                                        const Gap(10),
-                                                        Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 10),
-                                                          child: Row(
-                                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            ElevatedButton(
+                                                onPressed: (){
+                                                  showModalBottomSheet<void>(
+                                                    clipBehavior: Clip.hardEdge,
+                                                    isScrollControlled: true,
+                                                      useSafeArea: true,
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return SizedBox(
+                                                          height: MediaQuery.of(context).size.height,
+                                                          width: MediaQuery.of(context).size.width,
+                                                          child: Column(
                                                             children: [
-                                                              const Text("Past Locations", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
-                                                              GestureDetector(onTap: (){
-                                                                Navigator.pop(context);
-                                                              }, child: const Icon(Icons.close, color: Colors.black,))
+                                                              const Gap(10),
+                                                              Padding(
+                                                                padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 10),
+                                                                child: Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                  children: [
+                                                                    const Text("Past Locations", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                                                                    GestureDetector(onTap: (){
+                                                                      Navigator.pop(context);
+                                                                    }, child: const Icon(Icons.close, color: Colors.black,))
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child: ListView.builder(
+                                                                  scrollDirection: Axis.vertical,
+                                                                  itemCount: data.length,
+                                                                  itemBuilder: (BuildContext context, int index) {
+                                                                    String key = data.keys.elementAt(index);
+                                                                    return Padding(
+                                                                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                                                                      child: Card(
+                                                                        elevation: 3,
+                                                                        shadowColor: Colors.grey,
+                                                                        child: ListTile(
+                                                                          selectedTileColor: Colors.orange[100],
+                                                                          title: Text(key,style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                                                          trailing: Text("${data[key]['location']}" ,style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                ),
+                                                              ),
+                                                              // ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text("Close"))
                                                             ],
                                                           ),
-                                                        ),
-                                                        Expanded(
-                                                          child: ListView.builder(
-                                                            scrollDirection: Axis.vertical,
-                                                            itemCount: data.length,
-                                                            itemBuilder: (BuildContext context, int index) {
-                                                              String key = data.keys.elementAt(index);
-                                                              return Padding(
-                                                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                                child: Card(
-                                                                  elevation: 3,
-                                                                  shadowColor: Colors.grey,
-                                                                  child: ListTile(
-                                                                    selectedTileColor: Colors.orange[100],
-                                                                    title: Text(key,style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                                                    trailing: Text("${data[key]['location']}" ,style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                                                  ),
-                                                                ),
-                                                              );
-                                                            },
-                                                          ),
-                                                        ),
-                                                        // ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text("Close"))
-                                                      ],
-                                                    ),
+                                                        );
+                                                      }
                                                   );
-                                                }
-                                            );
-                                          },
-                                        style: const ButtonStyle(
-                                          backgroundColor: WidgetStatePropertyAll<Color>(Color(0xff363333)),
+                                                },
+                                              style: const ButtonStyle(
+                                                backgroundColor: WidgetStatePropertyAll<Color>(Color(0xff363333)),
+                                                elevation: WidgetStatePropertyAll(6),
+                                                shadowColor: WidgetStatePropertyAll(Colors.grey),
+                                              ),
+                                                child: const Text("View Past Locations",style: TextStyle(color: Colors.white70, fontSize: 16),),
+                                            ),
+                                            ElevatedButton(
+                                                onPressed: (){
+                                                  showModalBottomSheet<void>(
+                                                    clipBehavior: Clip.hardEdge,
+                                                      // isScrollControlled: true,
+                                                      // useSafeArea: true,
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return Center(
+                                                          child: SizedBox(
+                                                            // height: MediaQuery.of(context).size.height,
+                                                            width: MediaQuery.of(context).size.width,
+                                                            child: Column(
+                                                              children: [
+                                                                Column(
+                                                                  children: [
+                                                                    Padding(
+                                                                      padding: EdgeInsets.all(20),
+                                                                      child: Row(
+                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Text("Submit for Repair", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
+                                                                          IconButton(
+                                                                            onPressed: (){
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            color: Color(0xff363333),
+                                                                            icon: Icon(Icons.close),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                    FormBuilder(
+                                                                      key: _repairFormKey,
+                                                                      child: Padding(
+                                                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                                                        child: Column(
+                                                                          children: [
+                                                                            FormBuilderDropdown<String>(
+                                                                              name: 'reason',
+                                                                              decoration: const InputDecoration(
+                                                                                labelText: 'Reason for Repair',
+                                                                                filled: true,
+                                                                                fillColor: Colors.white,
+                                                                                border: InputBorder.none,
+                                                                              ),
+                                                                              items: const [
+                                                                                DropdownMenuItem(
+                                                                                  value: 'R1',
+                                                                                  child: Text('R1'),
+                                                                                ),
+                                                                                DropdownMenuItem(
+                                                                                  value: 'R2',
+                                                                                  child: Text('R2'),
+                                                                                ),
+                                                                                DropdownMenuItem(
+                                                                                  value: 'R3',
+                                                                                  child: Text('R3'),
+                                                                                ),
+                                                                                DropdownMenuItem(
+                                                                                  value: 'Other',
+                                                                                  child: Text('Other'),
+                                                                                ),
+                                                                              ],
+                                                                              validator: FormBuilderValidators.compose([
+                                                                                FormBuilderValidators.required(),
+                                                                              ]),
+                                                                            ),
+                                                                            const SizedBox(height: 10),
+                                                                            FormBuilderTextField(
+                                                                                name: 'email',
+                                                                                decoration: const InputDecoration(
+                                                                                hintText: "Enter detail for repair",
+                                                                                label: Text("Enter detail for repair"),
+                                                                                filled: true,
+                                                                                fillColor: Colors.white,
+                                                                                border: InputBorder.none,
+                                                                              ),
+                                                                              validator: FormBuilderValidators.compose([
+                                                                                FormBuilderValidators.required(),
+                                                                              ]),
+                                                                            ),
+                                                                            const SizedBox(height: 20),
+                                                                            ElevatedButton(
+                                                                              onPressed: () {
+                                                                                // Validate the form
+                                                                                if (_repairFormKey.currentState?.saveAndValidate() ?? false) {
+                                                                                  // If the form is valid, get the form data
+                                                                                  final formData = _repairFormKey.currentState?.value;
+                                                                                  print("Form is valid! Data: $formData");
+
+                                                                                  // Do something with the data, like send to server
+                                                                                } else {
+                                                                                  print("Form is invalid!");
+                                                                                }
+                                                                              },
+                                                                              style: ElevatedButton.styleFrom(
+                                                                                backgroundColor: const Color(0xff363333), // Button color
+                                                                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),  // Padding inside the button
+                                                                                elevation: 6, // Shadow effect
+                                                                                shadowColor: Colors.grey,
+                                                                              ),
+                                                                              child: const Text(
+                                                                                "Submit",
+                                                                                style: TextStyle(color: Colors.white70, fontSize: 16),
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                  );
+                                                },
+                                              style: const ButtonStyle(
+                                                backgroundColor: WidgetStatePropertyAll<Color>(Color(0xff363333)),
+                                                elevation: WidgetStatePropertyAll(6),
+                                                shadowColor: WidgetStatePropertyAll(Colors.grey),
+                                              ),
+                                                child: const Text("Give for Repair",style: TextStyle(color: Colors.white70, fontSize: 16),),
+                                            ),
+                                          ],
                                         ),
-                                          child: const Text("View Past Locations",style: TextStyle(color: Colors.white70),),
                                       ),
+                                      // widget.isRepairing ? Text("data") : Text("data"),
+                                      const Text("This vehicle is been repaired", style: TextStyle(color: Colors.red, fontSize: 16),),
+                                      const Row(
+                                        children: [
+                                          Text("Reason:", style: TextStyle(color: Colors.red, fontSize: 16)),
+                                          Text("R1: XYZ...", style: TextStyle(color: Colors.red, fontSize: 16)),
+                                        ],
+                                      )
                                     ],
                                   ),
                                 ),
