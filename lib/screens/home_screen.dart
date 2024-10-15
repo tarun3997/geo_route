@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeVehicleModel(image: 'car.png', cardTitle: "Four-wheeler", count: 0),
     HomeVehicleModel(image: 'truck.png', cardTitle: "Heavy vehicle", count: 0),
     HomeVehicleModel(image: 'car.png', cardTitle: "Repair vehicle", count: 0),
-    HomeVehicleModel(image: 'car.png', cardTitle: "table", count: 0),
+    HomeVehicleModel(image: 'car.png', cardTitle: "Vehicle Record"),
   ];
 
   final VehicleApi vehicleApi = VehicleApi();
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
         homeVehicleModel[1].count = data['twoWheeler'] ?? 0;
         homeVehicleModel[2].count = data['fourWheeler'] ?? 0;
         homeVehicleModel[3].count = data['heavyVehicle'] ?? 0;
-        // homeVehicleModel[4].count = data['repairingVehicle'] ?? 0;
+        homeVehicleModel[4].count = data['repairingVehicle'] ?? 0;
         isLoading = false;
       });
     } catch (e) {
@@ -138,31 +138,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 _showCupertinoMenu();
               }
             },
-            child: CircleAvatar(
-              radius: 18,
-              child: Theme.of(context).platform == TargetPlatform.iOS
-                  ? const Icon(Icons.person, size: 26)
-                  : Center(
-                      child: PopupMenuButton(
-                        icon: const Icon(
-                          Icons.person,
-                          size: 26,
-                        ),
-                        itemBuilder: (context) {
-                          return [
-                            const PopupMenuItem(
-                                value: 'setting', child: Text('Setting')),
-                            PopupMenuItem(
-                                onTap: () {
-                                  Authentication().handleUserLogout(context);
-                                },
-                                value: 'logout',
-                                child: const Text('Logout')),
-                          ];
-                        },
-                      ),
+            child: Theme.of(context).platform == TargetPlatform.iOS
+                ? const CircleAvatar(
+                radius: 18,
+                child: Icon(Icons.person, size: 26))
+                : PopupMenuButton(
+                  icon: const CircleAvatar(
+                    radius: 18,
+                    child: Icon(
+                      Icons.person,
+                      size: 26,
                     ),
-            ),
+                  ),
+                  itemBuilder: (context) {
+                    return [
+                      const PopupMenuItem(
+                          value: 'setting', child: Text('Setting')),
+                      PopupMenuItem(
+                          onTap: () {
+                            Authentication().handleUserLogout(context);
+                          },
+                          value: 'logout',
+                          child: const Text('Logout')),
+                    ];
+                  },
+                ),
           ),
           const SizedBox(width: 8),
         ],

@@ -1,14 +1,22 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:geo_route/model/vehicle_details_model.dart';
-import 'package:geo_route/server/api/update_api.dart';
+import 'package:geo_route/provider/vehicle_repair_provider.dart';
 import 'package:geo_route/server/api/vehicle_api.dart';
 import 'package:geo_route/server/services/mapmyindia_config.dart';
+import 'package:geo_route/utils/error_handler.dart';
 import 'package:geo_route/utils/gap.dart';
+import 'package:geo_route/widget/custom_bottom_sheet.dart';
+import 'package:geo_route/widget/custom_button.dart';
+import 'package:geo_route/widget/custom_linear_progress_indicator.dart';
+import 'package:geo_route/widget/vehicle_fuel_info_card.dart';
+import 'package:geo_route/widget/vehicle_imp_info.dart';
+import 'package:geo_route/widget/vehicle_info_card.dart';
+import 'package:geo_route/widget/vehicle_repairing_info_card.dart';
+import 'package:geo_route/widget/vehicle_speed_info_card.dart';
 import 'package:mapmyindia_gl/mapmyindia_gl.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class VehicleDetailsScreen extends StatefulWidget {
@@ -25,54 +33,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
 
   final VehicleApi vehicleApi = VehicleApi();
   late Future<VehicleDetailsModel> vehicleDetailsFuture;
-  final TextEditingController _textFieldController = TextEditingController();
-  final Map<String, dynamic> data = {
-    "demo1": {
-      "location": "Udaipur"
-    },
-    "demo2": {
-      "location": "Jaipur"
-    },
-    "demo3": {
-      "location": "Delhi"
-    },
-    "demo4": {
-      "location": "Mumbai"
-    },
-    "demo5": {
-      "location": "Kolkata"
-    },
-    "demo6": {
-      "location": "Chennai"
-    },
-    "demo7": {
-      "location": "Bangalore"
-    },
-    "demo8": {
-      "location": "Hyderabad"
-    },
-    "demo9": {
-      "location": "Ahmedabad"
-    },
-    "demo10": {
-      "location": "Pune"
-    },
-    "demo11": {
-      "location": "Surat"
-    },
-    "demo12": {
-      "location": "Lucknow"
-    },
-    "demo13": {
-      "location": "Chandigarh"
-    },
-    "demo14": {
-      "location": "Bhopal"
-    },
-  };
-  final List limitColor = [const AlwaysStoppedAnimation<Color>(Colors.green),const AlwaysStoppedAnimation<Color>(Colors.yellow),const AlwaysStoppedAnimation<Color>(Colors.red),];
-  int colorIndex = 0;
-  final _repairFormKey = GlobalKey<FormBuilderState>();
+
 
   @override
   void initState() {
@@ -114,7 +75,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
         throw 'Could not launch $url';
       }
     } catch (e) {
-      print('Error launching URL: $e');
+      ErrorHandler().showError(context, "Getting error to open map. Please try again");
     }
   }
 
@@ -127,100 +88,12 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
     _addMarker(lat: vehicleDetails.lat, lng: vehicleDetails.lng);
   }
 
-  String? userInput;
 
-  Future<void> displayUpdateDialog({required String title,required String id}) async{
-    showDialog(context: context, builder: (BuildContext context) {
-      return Theme.of(context).platform == TargetPlatform.iOS ?
-      CupertinoAlertDialog(
 
-        title: Text(title),
-
-        content: Column(
-          children: [
-            const Gap(10),
-            CupertinoTextField(
-              onChanged: (value) {
-                setState(() {
-                  userInput = value;
-                });
-              },
-              keyboardType: TextInputType.number,
-              controller: _textFieldController,
-              placeholder: "Set new limit",
-              style: const TextStyle(fontSize: 16),
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.black, // Underline color
-                    width: 1.0,        // Underline width
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          CupertinoDialogAction(child: const Text('Cancel'), onPressed: (){
-            _textFieldController.clear();
-            userInput = null;
-            Navigator.of(context).pop();
-          },),
-          CupertinoDialogAction(child: const Text('Update'), onPressed: ()async{
-            if(userInput != null && userInput!.isNotEmpty){
-              await updateVehicleKmLimit(context: context, id: id, newLimit: int.parse(userInput!),refresh: _refreshData);
-              _textFieldController.clear();
-              userInput = null;
-            }
-          },)
-
-        ],
-      )
-          : AlertDialog(
-
-        title: Text(title),
-        content: TextField(
-          onChanged: (value) {
-            setState(() {
-              userInput = value;
-            });
-          },
-          controller: _textFieldController,
-          keyboardType: TextInputType.number,
-
-          decoration: const InputDecoration(hintText: "Set new limit"),
-        ),
-        actions: [
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              _textFieldController.clear();
-              userInput = null;
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: const Text('Update'),
-            onPressed: () async {
-              if (userInput != null && userInput!.isNotEmpty) {
-                await updateVehicleKmLimit(context: context,
-                    id: id,
-                    newLimit: int.parse(userInput!),
-                    refresh: _refreshData);
-                _textFieldController.clear();
-                userInput = null;
-              }
-            },
-          ),
-        ],
-      );
-    }
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    colorIndex = ((5080/ 6000) * 2).round();
+    bool isVehicleUnderRepairing = context.watch<VehicleRepairProvider>().isVehicleUnderRepairing;
     return Scaffold(
       appBar: AppBar(
         title: const Text("MAP"),
@@ -246,8 +119,9 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
             return const Center(child: Text("No data found"));
           } else {
             final vehicleDetails = snapshot.data!;
-            final totalRun = double.parse(vehicleDetails.vehicleNewKm);
-            final limit = vehicleDetails.vehicleKMLimit;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.read<VehicleRepairProvider>().setVehicleRepairStatus(vehicleDetails.isVehicleUnderRepairing);
+            });
             return Stack(
               children: [
                 SizedBox(
@@ -339,453 +213,27 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                 child: Container(
                                   margin: const EdgeInsets.symmetric(horizontal: 16),
                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Image.asset("assets/${vehicleDetails.vehicleType.toString().split('.').last}.png",width: 54,),
-                                          const SizedBox(width: 16,),
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(vehicleDetails.vehicleName ?? "N/A", style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),),
-                                              Text(vehicleDetails.isActive! ? "Active" : "Active", style: const TextStyle(fontSize: 12),),
-                                            ],
-                                          ),
-                                            ],
-                                          ),
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  const Icon(Icons.local_gas_station_outlined, size: 18,),
-                                              Text(":- ${vehicleDetails.vehicleFuelType}", style: const TextStyle(fontSize: 12),)
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  const Icon(Icons.sim_card_outlined, size: 18,),
-                                              Text(":- ${vehicleDetails.id}", style: const TextStyle(fontSize: 12),)
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-
-                                        ],
-                                      ),
-                                      const Gap(16),
-                                      Row(
-                                        children: [
-                                          const Icon(Icons.location_on_outlined),
-                                          const SizedBox(width: 8,),
-                                          Expanded(
-                                            child: Text(
-                                              vehicleDetails.currentLocation ?? "",
-                                              overflow: TextOverflow.visible,
-                                              softWrap: true,
-                                              style: const TextStyle(color: Colors.black, fontSize: 16),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                      VehicleImpInfo(vehicleImg: "assets/${vehicleDetails.vehicleType.toString().split('.').last}.png",vehicleName: vehicleDetails.vehicleName ?? "N/A",isActive: vehicleDetails.isActive! ? "Active" : "Active",fuelType: vehicleDetails.vehicleFuelType ?? "N/A", id: vehicleDetails.id ?? "N/A",location: vehicleDetails.currentLocation ?? "N/A",),
+                                      const Gap(8),
+                                      if(isVehicleUnderRepairing)
+                                       VehicleRepairingInfoCard(vehicleDetails: vehicleDetails,onRepairDone: ()=> context.read<VehicleRepairProvider>().setVehicleRepairStatus(false),),
                                       const Gap(12),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                                        child: Column(
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Text("${vehicleDetails.vehicleNewKm} Km"),
-                                                Text("${vehicleDetails.vehicleKMLimit} Km"),
-                                              ],
-                                            ),
-                                            LinearProgressIndicator(
-                                              value: totalRun / limit, // total run/limit
-
-                                              valueColor: limitColor[colorIndex],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      CustomLinearProgressIndicator(vehicleNewKm: vehicleDetails.vehicleNewKm,vehicleKMLimit: "${vehicleDetails.vehicleKMLimit}",),
 
                                       const Gap(12),
-                                      Card(
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(3),
-                                            topLeft: Radius.circular(3),
-                                          ),
-                                        ),
-                                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                                        color: Colors.white,
-                                        elevation: 2,
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 30,
-                                              width: MediaQuery.of(context).size.width,
-                                              decoration: const BoxDecoration(
-                                                color: Color(0xff363333),
-                                              ),
-                                              child: const Center(
-                                                child: Text(
-                                                  "Vehicle Info",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                children: [
-                                                  cardData(title: "Total Run", value: "${vehicleDetails.vehicleRunKM}", type:"Km"),
-                                                  const SizedBox(
-                                                    height: 24,
-                                                    child: VerticalDivider(),
-                                                  ),
-                                                  cardData(title: "Limit Left", value: "${vehicleDetails.vehicleLimitLeft}", type: "Km"),
-                                                  const SizedBox(
-                                                    height: 24,
-                                                    child: VerticalDivider(),
-                                                  ),
-                                                  cardData(title: "Limit", value: "${vehicleDetails.vehicleKMLimit}", type:"Km" )
-                                                ],
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: (){
-                                                displayUpdateDialog(title: "Edit vehicle KM limit",id: vehicleDetails.id!);
-                                              },
-                                              child: const Row(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  Text("Edit Limit", style: TextStyle(fontWeight: FontWeight.bold),),
-                                                  Icon(Icons.arrow_forward_ios_outlined, size: 12,),
-                                                ],
-                                              ),
-                                            ),
-                                                const Gap(6)
-                                          ],
-                                        ),
-                                      ),
+                                      VehicleInfoCard(vehicleRunKM: vehicleDetails.vehicleRunKM ?? "N/A",vehicleLimitLeft: vehicleDetails.vehicleLimitLeft ?? "N/A",vehicleKMLimit: "${vehicleDetails.vehicleKMLimit}",refreshData: _refreshData,vehicleId: vehicleDetails.id!,),
                                       const Gap(12),
-                                      Card(
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(3),
-                                            topLeft: Radius.circular(3),
-                                          ),
-                                        ),
-                                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                                        color: Colors.white,
-                                        elevation: 2,
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 30,
-                                              width: MediaQuery.of(context).size.width,
-                                              decoration: const BoxDecoration(
-                                                color: Color(0xff363333),
-                                              ),
-                                              child: const Center(
-                                                child: Text(
-                                                  "Speed Info",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                children: [
-                                                  cardData(title: "Avg Speed", value: vehicleDetails.averageSpeed.toStringAsFixed(2), type:"Km/h"),
-                                                  const SizedBox(
-                                                    height: 24,
-                                                    child: VerticalDivider(),
-                                                  ),
-                                                  cardData(title: "Max Speed", value: "${vehicleDetails.maxSpeed}", type: "Km/h"),
-                                                  const SizedBox(
-                                                    height: 24,
-                                                    child: VerticalDivider(),
-                                                  ),
-                                                  cardData(title: "Last Speed", value: "${vehicleDetails.lastSpeed}", type:"Km/h" )
-                                                ],
-                                              ),
-                                            ),
-
-                                          ],
-                                        ),
-                                      ),
+                                      VehicleSpeedInfoCard(vehicleDetails: vehicleDetails),
                                       const Gap(12),
-                                      Card(
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(3),
-                                            topLeft: Radius.circular(3),
-                                          ),
-                                        ),
-                                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                                        color: Colors.white,
-                                        elevation: 2,
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              height: 30,
-                                              width: MediaQuery.of(context).size.width,
-                                              decoration: const BoxDecoration(
-                                                color: Color(0xff363333),
-                                              ),
-                                              child: const Center(
-                                                child: Text(
-                                                  "Fuel Info",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.w500,
-
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                children: [
-                                                  cardData(title: "Refueled on", value: "27/08/2024", type:""),
-                                                  const SizedBox(
-                                                    height: 24,
-                                                    child: VerticalDivider(),
-                                                  ),
-                                                  cardData(title: "Mileage", value: "18", type: "kmpl"),
-
-                                                ],
-                                              ),
-                                            ),
-
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            ElevatedButton(
-                                                onPressed: (){
-                                                  showModalBottomSheet<void>(
-                                                    clipBehavior: Clip.hardEdge,
-                                                    isScrollControlled: true,
-                                                      useSafeArea: true,
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return SizedBox(
-                                                          height: MediaQuery.of(context).size.height,
-                                                          width: MediaQuery.of(context).size.width,
-                                                          child: Column(
-                                                            children: [
-                                                              const Gap(10),
-                                                              Padding(
-                                                                padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 10),
-                                                                child: Row(
-                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                  children: [
-                                                                    const Text("Past Locations", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
-                                                                    GestureDetector(onTap: (){
-                                                                      Navigator.pop(context);
-                                                                    }, child: const Icon(Icons.close, color: Colors.black,))
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                              Expanded(
-                                                                child: ListView.builder(
-                                                                  scrollDirection: Axis.vertical,
-                                                                  itemCount: data.length,
-                                                                  itemBuilder: (BuildContext context, int index) {
-                                                                    String key = data.keys.elementAt(index);
-                                                                    return Padding(
-                                                                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                                                                      child: Card(
-                                                                        elevation: 3,
-                                                                        shadowColor: Colors.grey,
-                                                                        child: ListTile(
-                                                                          selectedTileColor: Colors.orange[100],
-                                                                          title: Text(key,style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                                                          trailing: Text("${data[key]['location']}" ,style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                                                                        ),
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                ),
-                                                              ),
-                                                              // ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text("Close"))
-                                                            ],
-                                                          ),
-                                                        );
-                                                      }
-                                                  );
-                                                },
-                                              style: const ButtonStyle(
-                                                backgroundColor: WidgetStatePropertyAll<Color>(Color(0xff363333)),
-                                                elevation: WidgetStatePropertyAll(6),
-                                                shadowColor: WidgetStatePropertyAll(Colors.grey),
-                                              ),
-                                                child: const Text("View Past Locations",style: TextStyle(color: Colors.white70, fontSize: 16),),
-                                            ),
-                                            ElevatedButton(
-                                                onPressed: (){
-                                                  showModalBottomSheet<void>(
-                                                    clipBehavior: Clip.hardEdge,
-                                                      // isScrollControlled: true,
-                                                      // useSafeArea: true,
-                                                      context: context,
-                                                      builder: (BuildContext context) {
-                                                        return Center(
-                                                          child: SizedBox(
-                                                            // height: MediaQuery.of(context).size.height,
-                                                            width: MediaQuery.of(context).size.width,
-                                                            child: Column(
-                                                              children: [
-                                                                Column(
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding: EdgeInsets.all(20),
-                                                                      child: Row(
-                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                        children: [
-                                                                          Text("Submit for Repair", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),),
-                                                                          IconButton(
-                                                                            onPressed: (){
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            color: Color(0xff363333),
-                                                                            icon: Icon(Icons.close),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                    FormBuilder(
-                                                                      key: _repairFormKey,
-                                                                      child: Padding(
-                                                                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                                                        child: Column(
-                                                                          children: [
-                                                                            FormBuilderDropdown<String>(
-                                                                              name: 'reason',
-                                                                              decoration: const InputDecoration(
-                                                                                labelText: 'Reason for Repair',
-                                                                                filled: true,
-                                                                                fillColor: Colors.white,
-                                                                                border: InputBorder.none,
-                                                                              ),
-                                                                              items: const [
-                                                                                DropdownMenuItem(
-                                                                                  value: 'R1',
-                                                                                  child: Text('R1'),
-                                                                                ),
-                                                                                DropdownMenuItem(
-                                                                                  value: 'R2',
-                                                                                  child: Text('R2'),
-                                                                                ),
-                                                                                DropdownMenuItem(
-                                                                                  value: 'R3',
-                                                                                  child: Text('R3'),
-                                                                                ),
-                                                                                DropdownMenuItem(
-                                                                                  value: 'Other',
-                                                                                  child: Text('Other'),
-                                                                                ),
-                                                                              ],
-                                                                              validator: FormBuilderValidators.compose([
-                                                                                FormBuilderValidators.required(),
-                                                                              ]),
-                                                                            ),
-                                                                            const SizedBox(height: 10),
-                                                                            FormBuilderTextField(
-                                                                                name: 'email',
-                                                                                decoration: const InputDecoration(
-                                                                                hintText: "Enter detail for repair",
-                                                                                label: Text("Enter detail for repair"),
-                                                                                filled: true,
-                                                                                fillColor: Colors.white,
-                                                                                border: InputBorder.none,
-                                                                              ),
-                                                                              validator: FormBuilderValidators.compose([
-                                                                                FormBuilderValidators.required(),
-                                                                              ]),
-                                                                            ),
-                                                                            const SizedBox(height: 20),
-                                                                            ElevatedButton(
-                                                                              onPressed: () {
-                                                                                // Validate the form
-                                                                                if (_repairFormKey.currentState?.saveAndValidate() ?? false) {
-                                                                                  // If the form is valid, get the form data
-                                                                                  final formData = _repairFormKey.currentState?.value;
-                                                                                  print("Form is valid! Data: $formData");
-
-                                                                                  // Do something with the data, like send to server
-                                                                                } else {
-                                                                                  print("Form is invalid!");
-                                                                                }
-                                                                              },
-                                                                              style: ElevatedButton.styleFrom(
-                                                                                backgroundColor: const Color(0xff363333), // Button color
-                                                                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),  // Padding inside the button
-                                                                                elevation: 6, // Shadow effect
-                                                                                shadowColor: Colors.grey,
-                                                                              ),
-                                                                              child: const Text(
-                                                                                "Submit",
-                                                                                style: TextStyle(color: Colors.white70, fontSize: 16),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
-                                                  );
-                                                },
-                                              style: const ButtonStyle(
-                                                backgroundColor: WidgetStatePropertyAll<Color>(Color(0xff363333)),
-                                                elevation: WidgetStatePropertyAll(6),
-                                                shadowColor: WidgetStatePropertyAll(Colors.grey),
-                                              ),
-                                                child: const Text("Give for Repair",style: TextStyle(color: Colors.white70, fontSize: 16),),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      VehicleFuelInfoCard(vehicleDetails: vehicleDetails),
+                                      const Gap(18),
+                                      CustomButton(title: "Give for Repair", onTap: (){
+                                      CustomBottomSheet.repairBottomSheet(context: context,id: vehicleDetails.id!);
+                                      }),
                                       // widget.isRepairing ? Text("data") : Text("data"),
-                                      const Text("This vehicle is been repaired", style: TextStyle(color: Colors.red, fontSize: 16),),
-                                      const Row(
-                                        children: [
-                                          Text("Reason:", style: TextStyle(color: Colors.red, fontSize: 16)),
-                                          Text("R1: XYZ...", style: TextStyle(color: Colors.red, fontSize: 16)),
-                                        ],
-                                      )
+
                                     ],
                                   ),
                                 ),
@@ -806,69 +254,4 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
   }
 }
 
-Widget vehicleDetailCard({required BuildContext context, required String title, required String valueTitle,required String value, required String type }) {
-  return Card(
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.only(
-        topRight: Radius.circular(3),
-        topLeft: Radius.circular(3),
-      ),
-    ),
-    clipBehavior: Clip.antiAliasWithSaveLayer,
-    color: Colors.white,
-    elevation: 2,
-    child: Column(
-      children: [
-        Container(
-          height: 30,
-          width: MediaQuery.of(context).size.width,
-          decoration: const BoxDecoration(
-            color: Color(0xff363333),
-          ),
-          child: Center(
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-                fontSize: 18,
-              ),
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              cardData(title: valueTitle, value: value, type:type),
-              const SizedBox(
-                height: 24,
-                child: VerticalDivider(),
-              ),
-              cardData(title: valueTitle, value: value, type: type),
-              const SizedBox(
-                height: 24,
-                child: VerticalDivider(),
-              ),
-              cardData(title: valueTitle, value: value, type:type )
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
 
-Widget cardData({required String title, required String value, required String type}) {
-  return Column(
-    children: [
-      Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14, color: Colors.black),
-      ),
-      Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-      Text(type),
-    ],
-  );
-}

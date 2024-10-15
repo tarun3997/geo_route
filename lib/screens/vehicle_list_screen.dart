@@ -217,10 +217,12 @@ class _VehicleListScreenState extends State<VehicleListScreen>
 
     late List<VehicleShortDetailModel> vehicles;
 
-    // isRepairing
-        // ? vehicles = data.where((vehicle) => vehicle.isRepairing == true).toList()
-        // :
-    vehicles = data.where((vehicle) => vehicle.type == type).toList();
+    if (isRepairing) {
+      vehicles = data.where((vehicle) => vehicle.isVehicleUnderRepairing == true).toList();
+    } else {
+      // Show vehicles based on their type (car, bike, truck)
+      vehicles = data.where((vehicle) => vehicle.type == type).toList();
+    }
 
     if (vehicles.isEmpty) {
       return Center(
@@ -249,7 +251,8 @@ class _VehicleListScreenState extends State<VehicleListScreen>
               vehicleNumber: vehicle.vehicleNumber,
               updatedTime: vehicle.updatedTime,
               isActive: vehicle.isActive,
-              repairing: isRepairing,
+              repairing: vehicle.isVehicleUnderRepairing,
+
             ),
           );
         },

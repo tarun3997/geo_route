@@ -15,6 +15,7 @@ class VehicleShortDetailModel {
   double lng;
   int? todayKm;
   bool isActive;
+  bool isVehicleUnderRepairing;
 
   VehicleShortDetailModel(
       {required this.type,
@@ -27,6 +28,7 @@ class VehicleShortDetailModel {
       required this.lat,
       required this.lng,
       required this.remainingKm,
+        required this.isVehicleUnderRepairing,
         required this.isActive,
 
       required this.todayKm});
@@ -60,7 +62,8 @@ class VehicleShortDetailModel {
         todayKm: json['todayKm'] as int?,
         lat: lat ?? 0.0,
         lng: lng ?? 0.0,
-      isActive: json["isActive"]
+      isActive: json["isActive"],
+      isVehicleUnderRepairing: json["isVehicleUnderRepairing"],
     );
   }
 

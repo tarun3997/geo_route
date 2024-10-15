@@ -63,12 +63,13 @@ class _VehicleDetailsCardState extends State<VehicleDetailsCard> {
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(right: 28),
+                    padding: const EdgeInsets.only(right: 12),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         const Text("Condition",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
                         widget.repairing
-                            ? const Text("Repairing",style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),)
+                            ? const Text("Under Repairing",style: TextStyle(color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),)
                             : const Text("Good",style: TextStyle(color: Colors.green, fontSize: 16, fontWeight: FontWeight.bold),)
                       ],
                     ),

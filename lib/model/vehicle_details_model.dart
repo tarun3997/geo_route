@@ -21,6 +21,10 @@ class VehicleDetailsModel {
   double maxSpeed;
   double? lastSpeed;
   int? todayKm;
+  bool isVehicleUnderRepairing;
+  String? vehicleReason;
+  String? description;
+  String? damagePart;
 
   VehicleDetailsModel(
       {required this.id,
@@ -41,6 +45,10 @@ class VehicleDetailsModel {
         required this.averageSpeed,
         required this.maxSpeed,
       required this.currentLocation,
+        this.damagePart,
+      required  this.isVehicleUnderRepairing,
+        this.description,
+        this.vehicleReason,
       required this.todayKm});
 
   factory VehicleDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -83,6 +91,10 @@ class VehicleDetailsModel {
           ? int.tryParse(json["todayKm"])
           : json["todayKm"]) as int?,
       vehicleName: json["vehicleType"],
+      isVehicleUnderRepairing: json["isVehicleUnderRepairing"],
+      vehicleReason: json["vehicleReason"],
+      damagePart: json["damagePart"],
+      description: json["description"],
     );
   }
 

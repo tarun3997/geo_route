@@ -21,7 +21,7 @@ class CarCard extends StatelessWidget {
             Column(
               children: [
                 Text(cardTitle!,style: textStyle,),
-                Text("$count", style: textStyle,)
+                Text("${count ?? ""}", style: textStyle,)
               ],
             )
 

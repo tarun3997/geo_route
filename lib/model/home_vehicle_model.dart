@@ -6,6 +6,6 @@ class HomeVehicleModel {
   HomeVehicleModel({
    required this.image,
    required this.cardTitle,
-   required this.count,
+    this.count,
 });
 }
