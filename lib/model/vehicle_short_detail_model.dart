@@ -16,6 +16,9 @@ class VehicleShortDetailModel {
   int? todayKm;
   bool isActive;
   bool isVehicleUnderRepairing;
+  double? fuelAmount;
+  String? refuelDate;
+  double? mileage;
 
   VehicleShortDetailModel(
       {required this.type,
@@ -30,6 +33,9 @@ class VehicleShortDetailModel {
       required this.remainingKm,
         required this.isVehicleUnderRepairing,
         required this.isActive,
+        required this.fuelAmount,
+        required this.refuelDate,
+        required this.mileage,
 
       required this.todayKm});
 
@@ -64,6 +70,9 @@ class VehicleShortDetailModel {
         lng: lng ?? 0.0,
       isActive: json["isActive"],
       isVehicleUnderRepairing: json["isVehicleUnderRepairing"],
+        fuelAmount: json["fuelAmount"] as double?,
+        refuelDate: json["refuelDate"] as String?,
+        mileage: json["mileage"] as double?
     );
   }
 

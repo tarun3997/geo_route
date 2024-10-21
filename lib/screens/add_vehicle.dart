@@ -15,6 +15,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
   final List<String> vehicleOption = [
     'Motorcycle',
+    'Gypsy',
     'Tom25',
     'ALS',
     'TATRA',
@@ -101,27 +102,42 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                   hint: "Enter Current Vehicle Km",
                                   text: "Vehicle Km",
                                   keyboardType: TextInputType.number),
-                              dropDownDecor(
-                                  name: "vehicleType",
-                                  hint: "Select Vehicle Type",
-                                  text: "Vehicle type",
-                                  listOption: vehicleOption),
                               Row(
                                 children: [
+                                  Expanded(
+                                    child: dropDownDecor(
+                                        name: "vehicleType",
+                                        hint: "Select Vehicle Type",
+                                        text: "Vehicle type",
+                                        listOption: vehicleOption),
+                                  ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
                                   Expanded(
                                       child: dropDownDecor(
                                           name: "fuelType",
                                           hint: "Fuel Type",
                                           text: "Fuel Type",
                                           listOption: fuelOption)),
-                                  const SizedBox(
-                                    width: 12,
-                                  ),
+                                ],
+                              ),
+                              Row(
+                                children: [
                                   Expanded(
                                       child: textFieldDecor(
                                           name: "setLimit",
                                           hint: "Limit",
                                           text: "Vehicle Limit",
+                                          keyboardType: TextInputType.number)),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  Expanded(
+                                      child: textFieldDecor(
+                                          name: "fuelAmount",
+                                          hint: "liter",
+                                          text: "Fuel Filled",
                                           keyboardType: TextInputType.number)),
                                 ],
                               ),
@@ -148,6 +164,7 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                         form?["vehicleType"]?.value;
                                     final fuelType = form?["fuelType"]?.value;
                                     final setLimit = int.parse(form?["setLimit"]?.value ?? '0');
+                                    final fuelAmount = double.parse(form?["fuelAmount"]?.value ?? '0');
                                     VehicleApi().handleAddVehicleApi(
                                         context: context,
                                         id: id,
@@ -156,7 +173,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                         vehicleKm: vehicleKm,
                                         vehicleType: vehicleType,
                                         fuelType: fuelType,
-                                        setLimit: setLimit);
+                                        setLimit: setLimit,
+                                        fuelAmount: fuelAmount
+                                    );
                                   }
                                 },
                                 child: const Text('Submit',

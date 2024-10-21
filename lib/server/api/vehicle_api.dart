@@ -7,6 +7,7 @@ import 'package:geo_route/screens/home_screen.dart';
 import 'package:geo_route/server/url.dart';
 import 'package:geo_route/utils/error_handler.dart';
 import 'package:geo_route/utils/navigation_utils.dart';
+import 'package:geo_route/widget/snack_bar.dart';
 
 class VehicleApi {
   final Dio dio = Dio();
@@ -70,7 +71,8 @@ class VehicleApi {
       required int vehicleKm,
       required String vehicleType,
       required String fuelType,
-      required int setLimit}) async {
+      required int setLimit,
+      required double fuelAmount}) async {
     try {
       final response = await dio.post("$url/api/vehicle-detail", data: {
         "id": id,
@@ -79,11 +81,13 @@ class VehicleApi {
         "vehicleRunKM": vehicleKm,
         "vehicleFuelType": fuelType,
         "vehicleKMLimit": setLimit,
-        "driverName": driverName
+        "driverName": driverName,
+        "fuelAmount": fuelAmount
       });
       if (response.statusCode == 201){
         if(context.mounted){
         NavigationUtils.navigatorPushAndRemoveUntil(context, const HomeScreen());
+        showSnackBar(context, Colors.green, "Added successful");
         }
       } else {
         if(context.mounted){

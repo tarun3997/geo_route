@@ -21,9 +21,9 @@ class Authentication{
       });
       if(response.statusCode == 201){
         // String id = response.data['id'];
-        NavigationUtils.navigatorPushAndRemoveUntil(context, const HomeScreen());
+        NavigationUtils.navigatorPushAndRemoveUntil(context, const ProfileScreen());
       }else{
-        ErrorHandler().showError(context,"Getting error in registration");
+        ErrorHandler().showError(context,"Getting error in registration1");
       }
     }catch(e){
       if(e is DioException){
@@ -31,10 +31,10 @@ class Authentication{
           String errorMessage = e.response!.data['message'];
           ErrorHandler().showError(context, errorMessage);
         }else {
-          ErrorHandler().showError(context,"Getting error in registration");
+          ErrorHandler().showError(context,"Getting error in registration2");
         }
       }else {
-        ErrorHandler().showError(context,"Getting error in registration");
+        ErrorHandler().showError(context,"Getting error in registration3");
       }
     }
   }

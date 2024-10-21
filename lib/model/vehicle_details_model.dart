@@ -25,6 +25,9 @@ class VehicleDetailsModel {
   String? vehicleReason;
   String? description;
   String? damagePart;
+  double? fuelAmount;
+  String? refuelDate;
+  double? mileage;
 
   VehicleDetailsModel(
       {required this.id,
@@ -49,7 +52,11 @@ class VehicleDetailsModel {
       required  this.isVehicleUnderRepairing,
         this.description,
         this.vehicleReason,
-      required this.todayKm});
+      required this.todayKm,
+        required this.fuelAmount,
+        required this.refuelDate,
+        required this.mileage
+      });
 
   factory VehicleDetailsModel.fromJson(Map<String, dynamic> json) {
     dynamic locationData = json['vehicleLocation'];
@@ -95,6 +102,9 @@ class VehicleDetailsModel {
       vehicleReason: json["vehicleReason"],
       damagePart: json["damagePart"],
       description: json["description"],
+      fuelAmount: (json["fuelAmount"] as num?)?.toDouble() ?? 0.0,
+      refuelDate: json["refuelDate"],
+      mileage: (json["mileage"] as num?)?.toDouble() ?? 0.0,
     );
   }
 

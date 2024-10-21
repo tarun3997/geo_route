@@ -51,11 +51,11 @@ void main() async {
   String? cachedToken = await Helper().getNotificationToken();
 
   if(cachedToken == null){
-  FirebaseMessaging.instance.getToken().then((value) {
-    if(value != null){
-      Helper().setNotificationToken(value);
-    }
-  });
+    FirebaseMessaging.instance.getToken().then((value) {
+      if(value != null){
+        Helper().setNotificationToken(value);
+      }
+    });
   }
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -86,7 +86,7 @@ void main() async {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => VehicleRepairProvider()),
   ],
-  child: const MyApp()));
+      child: const MyApp()));
 }
 
 

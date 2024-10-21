@@ -20,6 +20,8 @@ enum VehicleType{
         return VehicleType.truck;
       case 'Safari':
         return VehicleType.car;
+      case 'Gypsy':
+        return VehicleType.car;
       case 'Scorpio':
         return VehicleType.car;
       default:

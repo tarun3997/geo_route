@@ -8,10 +8,8 @@ class CustomLinearProgressIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List limitColor = [const AlwaysStoppedAnimation<Color>(Colors.green),const AlwaysStoppedAnimation<Color>(Colors.yellow),const AlwaysStoppedAnimation<Color>(Colors.red),];
-    int colorIndex = 0;
     final totalRun = double.parse(vehicleNewKm);
     final limit = double.parse(vehicleKMLimit);
-    colorIndex = ((5080/ 6000) * 2).round();
     return  Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
@@ -24,9 +22,8 @@ class CustomLinearProgressIndicator extends StatelessWidget {
             ],
           ),
           LinearProgressIndicator(
-            value: totalRun / limit, // total run/limit
-
-            valueColor: limitColor[colorIndex],
+            value: totalRun / limit,
+            valueColor: limitColor[((totalRun/ limit) * 2).round()],
           ),
         ],
       ),
