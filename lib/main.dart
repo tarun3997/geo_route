@@ -4,7 +4,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geo_route/provider/vehicle_repair_provider.dart';
-import 'package:geo_route/screens/home_screen.dart';
 import 'package:geo_route/screens/notification_screen.dart';
 import 'package:geo_route/screens/splash_screen.dart';
 import 'package:geo_route/utils/helper.dart';
@@ -171,7 +170,7 @@ class MyApp extends StatelessWidget {
       ),
       navigatorKey: navigatorKey,
       routes: {'/notification': ((context) => const NotificationScreen())},
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
