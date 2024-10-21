@@ -77,7 +77,21 @@ class _SignupScreenState extends State<SignupScreen> {
                                 ]),
                               ),
                               const SizedBox(height: 10),
-
+                              FormBuilderTextField(
+                                name: 'password',
+                                decoration: const InputDecoration(
+                                  prefixIcon: Icon(Icons.lock),
+                                  hintText: "password",
+                                  label: Text("Password"),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  border: InputBorder.none,
+                                ),
+                                obscureText: true,
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                ]),
+                              ),
                               const SizedBox(height: 20,),
                               MaterialButton(
                                 color: Colors.black,
@@ -100,7 +114,9 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                       ),
                       const SizedBox(height: 10,),
-
+                      TextButton(onPressed: (){
+                        NavigationUtils.navigatorPush(context, SignInScreen());
+                      }, child: Text("Login"))
                     ],
                   ),
                 ),

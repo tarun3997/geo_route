@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geo_route/model/vehicle_details_model.dart';
 import 'package:geo_route/provider/vehicle_repair_provider.dart';
+import 'package:geo_route/server/api/delete_vehicle.dart';
 import 'package:geo_route/server/api/vehicle_api.dart';
 import 'package:geo_route/server/services/mapmyindia_config.dart';
 import 'package:geo_route/utils/error_handler.dart';
@@ -215,7 +216,7 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      VehicleImpInfo(vehicleImg: "assets/${vehicleDetails.vehicleType.toString().split('.').last}.png",vehicleName: vehicleDetails.vehicleName ?? "N/A",isActive: vehicleDetails.isActive! ? "Active" : "Active",fuelType: vehicleDetails.vehicleFuelType ?? "N/A", id: vehicleDetails.id ?? "N/A",location: vehicleDetails.currentLocation ?? "N/A",),
+                                      VehicleImpInfo(vehicleImg: "assets/${vehicleDetails.vehicleType.toString().split('.').last}.png",vehicleName: vehicleDetails.vehicleName ?? "N/A",isActive: vehicleDetails.isActive! ? "Deactivated" : "Active",fuelType: vehicleDetails.vehicleFuelType ?? "N/A", id: vehicleDetails.id ?? "N/A",location: vehicleDetails.currentLocation ?? "N/A",),
                                       const Gap(8),
                                       if(isVehicleUnderRepairing)
                                        VehicleRepairingInfoCard(vehicleDetails: vehicleDetails,onRepairDone: ()=> context.read<VehicleRepairProvider>().setVehicleRepairStatus(false),),
@@ -227,13 +228,17 @@ class _VehicleDetailsScreenState extends State<VehicleDetailsScreen> {
                                       const Gap(12),
                                       VehicleSpeedInfoCard(vehicleDetails: vehicleDetails),
                                       const Gap(12),
-                                      VehicleFuelInfoCard(vehicleDetails: vehicleDetails),
+                                      VehicleFuelInfoCard(vehicleDetails: vehicleDetails, vehicleId: vehicleDetails.id!, refreshData: _refreshData,),
                                       const Gap(18),
-                                      CustomButton(title: "Give for Repair", onTap: (){
-                                      CustomBottomSheet.repairBottomSheet(context: context,id: vehicleDetails.id!);
-                                      }),
-                                      // widget.isRepairing ? Text("data") : Text("data"),
-
+                                      widget.isRepairing
+                                          ? const Text("")
+                                          : CustomButton(title: "Give for Repair", onTap: (){
+                                              CustomBottomSheet.repairBottomSheet(context: context,id: vehicleDetails.id!);
+                                          }),
+                                      const Gap(20),
+                                      CustomButton(title: "Delete vehicle", onTap: (){
+                                        deleteVehicle(id: vehicleDetails.id, context: context);
+                                      })
                                     ],
                                   ),
                                 ),

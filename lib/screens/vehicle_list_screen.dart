@@ -171,6 +171,12 @@ class _VehicleListScreenState extends State<VehicleListScreen>
                     );
                   } else {
                     final List<VehicleShortDetailModel> data = snapshot.data!;
+
+                    final List<VehicleShortDetailModel> carList = data.where((vehicle) => vehicle.type == VehicleType.car && vehicle.isVehicleUnderRepairing==false).toList();
+                    final List<VehicleShortDetailModel> bikeList = data.where((vehicle) => vehicle.type == VehicleType.bike && vehicle.isVehicleUnderRepairing==false).toList();
+                    final List<VehicleShortDetailModel> truckList = data.where((vehicle) => vehicle.type == VehicleType.truck && vehicle.isVehicleUnderRepairing==false).toList();
+                    final List<VehicleShortDetailModel> repairList = data.where((vehicle) => vehicle.isVehicleUnderRepairing == true).toList();
+
                     if (isSearching && _searchResult.isEmpty) {
                       return const Center(
                         child: Column(
@@ -192,13 +198,13 @@ class _VehicleListScreenState extends State<VehicleListScreen>
                         controller: tabController,
                         children: [
                           _buildVehicleList(
-                              data, VehicleType.car, textStyle, false),
+                              carList, textStyle, false),
                           _buildVehicleList(
-                              data, VehicleType.bike, textStyle, false),
+                              bikeList, textStyle, false),
                           _buildVehicleList(
-                              data, VehicleType.truck, textStyle, false),
+                              truckList, textStyle, false),
                           _buildVehicleList(
-                              data, VehicleType.bike, textStyle, true),
+                              repairList, textStyle, true),
                         ],
                       ),
                     );
@@ -212,21 +218,12 @@ class _VehicleListScreenState extends State<VehicleListScreen>
     );
   }
 
-  Widget _buildVehicleList(List<VehicleShortDetailModel> data,
-      VehicleType type, TextStyle textStyle, bool isRepairing) {
-
-    late List<VehicleShortDetailModel> vehicles;
-
-    if (isRepairing) {
-      vehicles = data.where((vehicle) => vehicle.isVehicleUnderRepairing == true).toList();
-    } else {
-      // Show vehicles based on their type (car, bike, truck)
-      vehicles = data.where((vehicle) => vehicle.type == type).toList();
-    }
+  Widget _buildVehicleList(List<VehicleShortDetailModel> vehicles,
+      TextStyle textStyle, bool isRepairing) {
 
     if (vehicles.isEmpty) {
       return Center(
-        child: Text('No ${isRepairing? 'repairing' : type.name} are available', style: textStyle),
+        child: Text('No ${isRepairing? 'repairing' : "vehicles"} are available', style: textStyle),
       );
     }
     return Theme.of(context).platform == TargetPlatform.iOS ? _buildCupertinoList(vehicles, isRepairing) : RefreshIndicator(

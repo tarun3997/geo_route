@@ -101,6 +101,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       const SizedBox(height: 10,),
+                      TextButton(onPressed: (){
+                        NavigationUtils.navigatorPush(context, SignupScreen());
+                      }, child: Text("Register")),
                     ],
                   ),
                 ),

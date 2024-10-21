@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geo_route/server/api/vehicle_repairing_api.dart';
+import 'package:geo_route/widget/snack_bar.dart';
 
 import '../model/vehicle_details_model.dart';
 
@@ -53,6 +54,9 @@ class VehicleRepairingInfoCard extends StatelessWidget {
                 GestureDetector(
                   onTap: (){
                     VehicleRepairingApi().handelVehicleRepairDone(id: vehicleDetails.id!, context: context, onRepairDone: onRepairDone);
+                    showSnackBar(context, Colors.green, "repaired Successfully");
+                    Navigator.pop(context);
+                    Navigator.pop(context);
                   },
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -23,6 +23,7 @@ class VehicleRepairingApi {
           'vehicleReason': vehicleReason,
           'description': description,
           'damagePart': damagePart,
+          'isVehicleUnderRepairing': true,
         },
         options: Options(
           contentType: 'application/json',
